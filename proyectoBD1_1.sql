@@ -1,7 +1,5 @@
-#Archivo batch (batalllas.sql) para la creación de la 
+#Archivo batch para la creación de la 
 #Base de datos del práctico de SQL
-
-#Lo que esta después del "#" es un comentario
 
 # Creo de la Base de Datos
 CREATE DATABASE parquimetros;
@@ -11,9 +9,8 @@ USE parquimetros;
 
 #-------------------------------------------------------------------------
 # Creación Tablas para las entidades
-
 CREATE TABLE conductores (
- DNI SMALLINT (45) positive NOT NULL,
+ dni SMALLINT (45) positive NOT NULL,
  nombre VARCHAR(45) NOT NULL,
  apellido VARCHAR(45) NOT NULL,
  direccion VARCHAR(45) NOT NULL,
@@ -21,8 +18,8 @@ CREATE TABLE conductores (
  registro SMALLINT positive NOT NULL,
 
  
- CONSTRAINT pk_barco_clase
- PRIMARY KEY (DNI)
+ CONSTRAINT pk_conductores
+ PRIMARY KEY (dni)
 }ENGINE=InnoDB
 
 CREATE TABLE automoviles (
@@ -32,7 +29,7 @@ CREATE TABLE automoviles (
  color VARCHAR(45) NOT NULL,
  dni SMALLINT (45) positive NOT NULL;
 
- CONSTRAINT pk_barcos 
+ CONSTRAINT pk_automoviles
  PRIMARY KEY (patente),
 
  CONSTRAINT FK_automoviles
@@ -41,7 +38,7 @@ CREATE TABLE automoviles (
 ) ENGINE=InnoDB;
 
 CREATE TABLE tipos_tarjeta (
- tipo VARCHAR (45) NOT NULL,
+ tipo VARCHAR (45),
  descuento DECIMAL (2,2) positive NOT NULL;
 
  CONSTRAINT tipos_tarjeta
@@ -54,7 +51,7 @@ CREATE TABLE tarjetas(
 	tipo VARCHAR(45) NOT NULL,
 	patente VARCHAR(45) NOT NULL;
 
-	CONSTRAINT tarjetas
+	CONSTRAINT pk_tarjetas
 		PRIMARY KEY (id_tarjeta),
 
 
@@ -82,13 +79,15 @@ CREATE TABLE ubicaciones(
 	tarifa SMALLINT DECIMAL(5,2) NOT NULL;
 
 
-	CONSTRAINT ubicaciones
+	CONSTRAINT pk_ubicaciones
 		PRIMARY KEY (altura,calle),
 )ENGINE=InnoDB;
 
 
  CREATE USER 'ventas'@'%'  IDENTIFIED BY 'venta';
  GRANT INSERT ON venta TO 'admin_batallas'@'localhost' WITH GRANT OPTION;
+
+#ELIMINAR EL USUARIO VACIO 
 
 
 #----------------------------------------------------------alan
