@@ -11,7 +11,7 @@ USE parquimetros;
 #Creacion Tablas para las entidades
 
 CREATE TABLE Ubicaciones(
-	altura SMALLINT UNSIGNED NOT NULL,
+	altura INT UNSIGNED NOT NULL,
 	calle VARCHAR(45) NOT NULL,
 	tarifa DECIMAL(5,2) UNSIGNED NOT NULL,
 
@@ -24,7 +24,7 @@ CREATE TABLE Parquimetros(
  id_parq INT UNSIGNED NOT NULL,
  numero INT UNSIGNED NOT NULL,
  calle VARCHAR(45) NOT NULL,
- altura SMALLINT UNSIGNED NOT NULL,
+ altura INT UNSIGNED NOT NULL,
 
  
  CONSTRAINT pk_parquimetros
@@ -37,8 +37,8 @@ CREATE TABLE Parquimetros(
 ) ENGINE=InnoDB;
 
 CREATE TABLE Inspectores(
-	legajo SMALLINT UNSIGNED NOT NULL,
-	dni SMALLINT UNSIGNED NOT NULL,
+	legajo INT UNSIGNED NOT NULL,
+	dni INT UNSIGNED NOT NULL,
 	nombre VARCHAR(45) NOT NULL,
 	password CHAR(32) NOT NULL,
 	apellido VARCHAR(45) NOT NULL,
@@ -50,9 +50,9 @@ CREATE TABLE Inspectores(
 
 CREATE TABLE Asociado_con (
  id_asociado_con INT UNSIGNED NOT NULL AUTO_INCREMENT,
- legajo SMALLINT UNSIGNED NOT NULL,
+ legajo INT UNSIGNED NOT NULL,
  calle VARCHAR(45) NOT NULL,
- altura SMALLINT UNSIGNED NOT NULL,
+ altura INT UNSIGNED NOT NULL,
  dia enum('do','lu','ma','mi','ju','vi','sa') NOT NULL,
  turno enum('m','t') NOT NULL,
 
@@ -71,12 +71,12 @@ CREATE TABLE Asociado_con (
 ) ENGINE=InnoDB;
 
 CREATE TABLE Conductores (
- dni SMALLINT (45) UNSIGNED NOT NULL,
+ dni INT (45) UNSIGNED NOT NULL,
  nombre VARCHAR(45) NOT NULL,
  apellido VARCHAR(45) NOT NULL,
  direccion VARCHAR(45) NOT NULL,
  telefono VARCHAR(45) ,
- registro SMALLINT(45) UNSIGNED NOT NULL,
+ registro INT(45) UNSIGNED NOT NULL,
 
  
  CONSTRAINT pk_conductores
@@ -88,7 +88,7 @@ CREATE TABLE Automoviles (
  modelo VARCHAR(45) NOT NULL,
  patente VARCHAR(6) NOT NULL, 
  color VARCHAR(45) NOT NULL,
- dni SMALLINT (45) UNSIGNED NOT NULL,
+ dni INT (45) UNSIGNED NOT NULL,
 
  CONSTRAINT pk_automoviles
  PRIMARY KEY (patente),
@@ -107,7 +107,7 @@ CREATE TABLE Tipos_tarjeta (
 ) ENGINE=InnoDB;
 
 CREATE TABLE Tarjetas(
-	id_tarjeta SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	id_tarjeta INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	saldo DECIMAL(5,2) NOT NULL,
 	tipo VARCHAR(45) NOT NULL,
 	patente CHAR(6) NOT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE Multa (
 
 
 CREATE TABLE Accede (
- legajo SMALLINT UNSIGNED NOT NULL,
+ legajo INT UNSIGNED NOT NULL,
  id_parq INT UNSIGNED NOT NULL,
  fecha DATE NOT NULL,
  hora TIME NOT NULL,
@@ -168,7 +168,7 @@ CREATE TABLE Accede (
 ) ENGINE=InnoDB;
 
 CREATE TABLE Estacionamientos (
- id_tarjeta SMALLINT UNSIGNED NOT NULL,
+ id_tarjeta INT UNSIGNED NOT NULL ,
  id_parq INT UNSIGNED NOT NULL,
  fecha_ent DATE NOT NULL,
  hora_ent TIME NOT NULL,

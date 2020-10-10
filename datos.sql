@@ -1,4 +1,4 @@
-USE batallas;
+USE parquimetros;
 
 #Inserciones de inspectores (el legajo es de 1 solo digito, el dni de 2 digitos)
 #-------------------------------------------------------------------
@@ -51,34 +51,41 @@ INSERT INTO asociado_con VALUES(4,1,"calle4",400,"ju","t");
 INSERT INTO asociado_con VALUES(5,1,"calle5",500,"vi","t");
 #---------------------------------------------------------------------
 
-INSERT INTO Tipos_tarjeta VALUES("tipo1",10.00);
-INSERT INTO Tipos_tarjeta VALUES("tipo2",20.00);
-INSERT INTO Tipos_tarjeta VALUES("tipo3",30.00);
-INSERT INTO Tipos_tarjeta VALUES("tipo4",40.00);
-INSERT INTO Tipos_tarjeta VALUES("tipo5",50.00);
+#Inserciones de Tipos_tarjeta 
+#---------------------tipo,descuento
+#---------------------------------------------------------------------
+INSERT INTO Tipos_tarjeta VALUES("tipo1",0.10);
+INSERT INTO Tipos_tarjeta VALUES("tipo2",0.20);
+INSERT INTO Tipos_tarjeta VALUES("tipo3",0.30);
+INSERT INTO Tipos_tarjeta VALUES("tipo4",0.40);
+INSERT INTO Tipos_tarjeta VALUES("tipo5",0.50);
 
-#Inserciones tarjetas(el id de tarjeta es de 9 digitos )
-INSERT INTO Tarjetas VALUES(111111111,0.0,"tipo1","AAA111");
-INSERT INTO Tarjetas VALUES(122222222,0.0,"tipo2","AAA222");
-INSERT INTO Tarjetas VALUES(333333333,0.0,"tipo2","AAA333");
-INSERT INTO Tarjetas VALUES(444444444,0.0,"tipo2","AAA444");
-INSERT INTO Tarjetas VALUES(555555555,0.0,"tipo5","AAA555");
+#Inserciones de tarjeta(el id_tarjeta es de 1 digitos) 
+#---------------------id_tarjeta,saldo,tipo,patente
+#---------------------------------------------------------------------
+INSERT INTO Tarjetas VALUES(11,0.0,"tipo1","AAA111");
+INSERT INTO Tarjetas VALUES(22,1.0,"tipo2","AAA222");
+INSERT INTO Tarjetas VALUES(33,2.0,"tipo2","AAA333");
+INSERT INTO Tarjetas VALUES(44,3.0,"tipo2","AAA444");
+INSERT INTO Tarjetas VALUES(55,4.0,"tipo5","AAA555");
+#Inserciones de Parquimetro(El id del parquimetro es de 4 digitos)
+#---------------------id_parq,numero,calle,altura
+#---------------------------------------------------------------------
 
-#Inserciones parquimetros( el id de parquimetro tendra 10 digitos)
+INSERT INTO Parquimetros VALUES(1111,111,"calle1","100");
+INSERT INTO Parquimetros VALUES(2222,222,"calle2","200");
+INSERT INTO Parquimetros VALUES(3333,333,"calle3","300");
+INSERT INTO Parquimetros VALUES(4444,444,"calle4","400");
+INSERT INTO Parquimetros VALUES(5555,555,"calle5","500");
 
-INSERT INTO Parquimetros VALUES(1111111111,111,"calle1","100");
-INSERT INTO Parquimetros VALUES(2222222222,222,"calle2","200");
-INSERT INTO Parquimetros VALUES(3333333333,333,"calle3","300");
-INSERT INTO Parquimetros VALUES(4444444444,444,"calle4","400");
-INSERT INTO Parquimetros VALUES(5555555555,555,"calle5","500");
-
-#Inserciones Estacionamientos
-
-INSERT INTO Estacionamientos VALUES(111111111,1111111111,"2020/01/01","01:01:01","11:01:01");
-INSERT INTO Estacionamientos VALUES(111111111,1111111111,"2020/01/01","01:01:01","11:01:01");
-INSERT INTO Estacionamientos VALUES(333333333,3333333333,"2020/03/03","03:03:03","04:03:03");
-INSERT INTO Estacionamientos VALUES(333333333,3333333333,"2020/03/03","03:03:03","04:03:03");
-INSERT INTO Estacionamientos VALUES(555555555,5555555555,"2020/05/05","05:05:05","09:05:05");
+#Inserciones de Estacionamientos
+#---------------------id_tarjeta,id_parq,fecha_ent,hora_ent,fecha_sal,hora_sal
+#---------------------------------------------------------------------
+INSERT INTO Estacionamientos VALUES(11,1111,"2020/01/01","01:01:01","2020/01/01","11:01:01");
+INSERT INTO Estacionamientos VALUES(22,2222,"2020/01/01","01:01:01","2020/01/01","11:01:01");
+INSERT INTO Estacionamientos VALUES(33,3333,"2020/01/01","03:03:03","2020/03/03","04:03:03");
+INSERT INTO Estacionamientos VALUES(44,4444,"2020/01/01","03:03:03","2020/03/03","04:03:03");
+INSERT INTO Estacionamientos VALUES(55,5555,"2020/01/01","05:05:05","2020/05/05","09:05:05");
 
 #Inserciones de multa (el nro de multa tiene 1 digito )
 #---------------------nro de multa,fecha, hora, patente, id_asociado_con
@@ -88,5 +95,14 @@ INSERT INTO multa VALUES(2,"2020/01/01","02:22:22","AAA111",2);
 INSERT INTO multa VALUES(3,"2020/01/01","03:11:11","AAA333",3);
 INSERT INTO multa VALUES(4,"2020/01/01","04:11:11","AAA444",4);
 INSERT INTO multa VALUES(5,"2020/01/01","05:11:11","AAA555",4);
+
+
+#Inserciones de accede
+#---------------------legajo,id_parq,fecha,hora
 #----------------------------------------------------------------------
 
+INSERT INTO Accede VALUES(1,1111,"2020/01/01","01:00:00");
+INSERT INTO Accede VALUES(2,2222,"2020/01/01","02:00:00");
+INSERT INTO Accede VALUES(3,3333,"2020/01/01","03:00:00");
+INSERT INTO Accede VALUES(4,4444,"2020/01/01","04:00:00");
+INSERT INTO Accede VALUES(5,5555,"2020/01/01","05:00:00");
