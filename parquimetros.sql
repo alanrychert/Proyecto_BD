@@ -194,8 +194,8 @@ CREATE TABLE Estacionamientos (
 
  CREATE VIEW estacionados AS 
  SELECT calle, altura, patente 
- FROM (parquimetros.parquimetros NATURAL JOIN estacionamientos NATURAL JOIN tarjetas)
- WHERE fecha_ent <> NULL and hora_ent <> NULL and fecha_sal = NULL and hora_sal = NULL;
+ FROM (parquimetros.parquimetros NATURAL JOIN parquimetros.estacionamientos NATURAL JOIN parquimetros.tarjetas)
+ WHERE estacionamientos.fecha_sal is NULL and estacionamientos.hora_sal is NULL;
 
 #-------------------------------------------------------------------------
 
