@@ -195,7 +195,7 @@ CREATE TABLE Estacionamientos (
  CREATE VIEW estacionados AS 
  SELECT calle, altura, patente 
  FROM (parquimetros.parquimetros NATURAL JOIN estacionamientos NATURAL JOIN tarjetas)
- WHERE fecha_ent <> NULL and hora_ent <> NULL and fecha_sal = NULL and hora_sal = NULL;
+ WHERE fecha_ent is not NULL and hora_ent is not NULL and fecha_sal is NULL and hora_sal is NULL;
 
 #-------------------------------------------------------------------------
 
@@ -235,5 +235,6 @@ CREATE USER 'inspector'@'%' IDENTIFIED BY 'inspector';
 GRANT SELECT ON parquimetros.Parquimetros TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Inspectores TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Estacionados TO 'inspector'@'%';
+GRANT SELECT ON parquimetros.Asociado_con TO 'inspector'@'%';
 GRANT INSERT ON parquimetros.Multa TO 'inspector'@'%';
 GRANT INSERT ON parquimetros.Accede TO 'inspector'@'%';
