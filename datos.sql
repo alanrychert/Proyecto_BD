@@ -82,9 +82,9 @@ INSERT INTO Parquimetros VALUES(5555,555,"calle5","500");
 #---------------------id_tarjeta,id_parq,fecha_ent,hora_ent,fecha_sal,hora_sal
 #---------------------------------------------------------------------
 INSERT INTO Estacionamientos VALUES(11,1111,"2020/01/01","01:01:01","2020/01/01","11:01:01");
-INSERT INTO Estacionamientos VALUES(22,2222,"2020/01/01","01:01:01","2020/01/01","11:01:01");
+INSERT INTO Estacionamientos VALUES(22,2222,"2020/01/01","01:01:01",NULL,NULL);
 INSERT INTO Estacionamientos VALUES(33,3333,"2020/01/01","03:03:03","2020/03/03","04:03:03");
-INSERT INTO Estacionamientos VALUES(44,4444,"2020/01/01","03:03:03","2020/03/03","04:03:03");
+INSERT INTO Estacionamientos VALUES(44,4444,"2020/01/01","03:03:03",NULL,NULL);
 INSERT INTO Estacionamientos VALUES(55,5555,"2020/01/01","05:05:05","2020/05/05","09:05:05");
 
 #Inserciones de multa (el nro de multa tiene 1 digito )

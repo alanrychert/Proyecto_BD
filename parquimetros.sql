@@ -235,5 +235,6 @@ CREATE USER 'inspector'@'%' IDENTIFIED BY 'inspector';
 GRANT SELECT ON parquimetros.Parquimetros TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Inspectores TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Estacionados TO 'inspector'@'%';
+GRANT SELECT ON parquimetros.Asociado_con TO 'inspector'@'%';
 GRANT INSERT ON parquimetros.Multa TO 'inspector'@'%';
 GRANT INSERT ON parquimetros.Accede TO 'inspector'@'%';
