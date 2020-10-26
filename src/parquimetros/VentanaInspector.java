@@ -1,36 +1,27 @@
 package parquimetros;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.border.BevelBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import quick.dbtable.DBTable;
 
 @SuppressWarnings("serial")
 public class VentanaInspector extends javax.swing.JInternalFrame 
@@ -137,6 +128,18 @@ public class VentanaInspector extends javax.swing.JInternalFrame
             */
             
                tabla = new JTable(); // Crea una tabla
+               tabla.setToolTipText("Doble-click o Espacio para seleccionar un parquimetro.");
+               tabla.addKeyListener(new KeyAdapter() {
+                  public void keyTyped(KeyEvent evt) {
+                     tablaKeyTyped(evt);
+                  }
+               });
+               
+               tabla.addMouseListener(new MouseAdapter() {
+                  public void mouseClicked(MouseEvent evt) {
+                     tablaMouseClicked(evt);
+                  }
+           		});
                scrTabla.setViewportView(tabla); //setea la tabla dentro del JScrollPane srcTabla               
                tabla.setModel(EstacionadosModel); // setea el modelo de la tabla  
                tabla.setAutoCreateRowSorter(true); // activa el ordenamiento por columnas, para
@@ -165,7 +168,29 @@ public class VentanaInspector extends javax.swing.JInternalFrame
    {
       this.refrescarTabla();
    }
-
+   private void tablaMouseClicked(MouseEvent evt) 
+   {
+      if ((this.tabla.getSelectedRow() != -1) && (evt.getClickCount() == 2))
+      {
+         this.seleccionarFila();
+      }
+   }
+   
+   private void tablaKeyTyped(KeyEvent evt) 
+   {
+      if ((this.tabla.getSelectedRow() != -1) && (evt.getKeyChar() == ' '))
+      {
+         this.seleccionarFila();
+      }
+   }
+   private void seleccionarFila()
+   {
+      int seleccionado = this.tabla.getSelectedRow();
+      
+      //ACA SE CAMBIARIA UN CUADRO DE TEXTO CON EL IDE DEL PARQUIMETRO 
+      //this.txtNombre.setText(this.tabla.getValueAt(this.tabla.getSelectedRow(), 0).toString());
+      //this.txtFecha.setText(Fechas.convertirDateAString((java.util.Date) this.tabla.getValueAt(this.tabla.getSelectedRow(), 1)));
+   }
 
    /*private void desconectarBD()
    {
