@@ -14,6 +14,9 @@ import java.util.Hashtable;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -35,7 +38,10 @@ public class PrincipalWindow {
 	private final String usuarioAdmin="ADMIN";
 	private final String usuarioInspector="INSPECTOR";
 	protected Connection conexionBD = null;
-
+	private JMenuBar jMenuBar1;
+	private JMenu mnuOpciones;
+	private JMenuItem mniLogin;
+	private JMenuItem mniLogout;
 	/**
 	 * Launch the application.
 	 */
@@ -71,16 +77,31 @@ public class PrincipalWindow {
 		desktopPane.setPreferredSize(new Dimension(800,600));
 		frame.getContentPane().add(desktopPane,BorderLayout.CENTER);
 		
-				
-		
-		JButton btnInspector = new JButton("LOGIN");
-		btnInspector.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				mostrarPanelLogin(frame);
-			}
-		});
-		btnInspector.setBounds(454, 236, 149, 67);
-		desktopPane.add(btnInspector);
+
+		jMenuBar1 = new JMenuBar();
+        frame.setJMenuBar(jMenuBar1);
+        
+        mnuOpciones = new JMenu();
+        jMenuBar1.add(mnuOpciones);
+        mnuOpciones.setText("Opciones");
+        
+        mniLogin = new JMenuItem();
+        mnuOpciones.add(mniLogin);
+        mniLogin.setText("Iniciar Sesion");
+        mniLogin.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+        	mostrarPanelLogin(frame);
+        	}
+        });
+        
+        mniLogout = new JMenuItem();
+        mnuOpciones.add(mniLogout);
+        mniLogout.setText("Cerrar Sesion");
+        mniLogout.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+        	//ACA SE CERRARIAN TODAS LAS VENTANAS Y SE CORTARIA LA CONEXION CON LA BD
+        	}
+        });
 		
 	
 	}
