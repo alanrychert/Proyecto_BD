@@ -7,6 +7,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import java.sql.Types;
+import java.sql.Connection;
+import java.sql.DriverManager;
 //import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -37,6 +39,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
    private DBTable tabla;    
    private JScrollPane scrConsulta;
    private PanelListas panelListas;
+   protected Connection conexionBD = null;
 
    
    
@@ -49,6 +52,10 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
    private void initGUI() 
    {
       try {
+    	conectarBD();
+      	// crea la tabla  
+      	tabla = new DBTable();   
+    	  
          setPreferredSize(new Dimension(800, 600));
          this.setBounds(0, 0, 800, 600);
          setVisible(true);
@@ -66,6 +73,8 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
                thisComponentShown(evt);
             }
          });
+         
+         
          {
             pnlConsulta = new JPanel();
             getContentPane().add(pnlConsulta, BorderLayout.NORTH);
@@ -109,8 +118,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
             }	
          }
          {
-        	// crea la tabla  
-        	tabla = new DBTable();
+        	
         	
         	// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
             getContentPane().add(tabla, BorderLayout.CENTER);           
@@ -118,7 +126,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
            // setea la tabla para sólo lectura (no se puede editar su contenido)  
            tabla.setEditable(false);   
            
-           panelListas= new PanelListas();
+           panelListas= new PanelListas(conexionBD);
            getContentPane().add(panelListas,BorderLayout.SOUTH);
                       
          }
@@ -129,12 +137,21 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
 
    private void thisComponentShown(ComponentEvent evt) 
    {
-      this.conectarBD();
+	   tabla.setConnection(conexionBD);
    }
    
    private void thisComponentHidden(ComponentEvent evt) 
    {
-      this.desconectarBD();
+	   try
+       {
+          tabla.close();            
+       }
+       catch (SQLException ex)
+       {
+          System.out.println("SQLException: " + ex.getMessage());
+          System.out.println("SQLState: " + ex.getSQLState());
+          System.out.println("VendorError: " + ex.getErrorCode());
+       } 
    }
 
    private void btnEjecutarActionPerformed(ActionEvent evt) 
@@ -142,53 +159,6 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
       this.refrescarTabla();      
    }
    
-   private void conectarBD()
-   {
-         try
-         {
-            String driver ="com.mysql.cj.jdbc.Driver";
-        	String servidor = "localhost:3306";
-        	String baseDatos = "parquimetros"; 
-        	String usuario = "admin";
-        	String clave = "admin";
-            String uriConexion = "jdbc:mysql://" + servidor + "/" + 
-        	                     baseDatos +"?serverTimezone=America/Argentina/Buenos_Aires";
-   
-       //establece una conexión con la  B.D. "parquimetros"  usando directamante una tabla DBTable    
-            tabla.connectDatabase(driver, uriConexion, usuario, clave);
-
-         }
-         catch (SQLException ex)
-         {
-            JOptionPane.showMessageDialog(this,
-                           "Se produjo un error al intentar conectarse a la base de datos.\n" 
-                            + ex.getMessage(),
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
-         }
-         catch (ClassNotFoundException e)
-         {
-            e.printStackTrace();
-         }
-      
-   }
-
-   private void desconectarBD()
-   {
-         try
-         {
-            tabla.close();            
-         }
-         catch (SQLException ex)
-         {
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
-         }      
-   }
 
    private void refrescarTabla()
    {
@@ -235,7 +205,54 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
       }
       
    }
+   
+   
+   private void conectarBD()
+   {
+      if (this.conexionBD == null)
+      {             
+         try
+         {  //se genera el string que define los datos de la conexión 
+            String servidor = "localhost:3306";
+            String baseDatos = "parquimetros";
+            String usuario = "admin";
+            String clave = "admin";
+            String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos + 
+            		          "?serverTimezone=America/Argentina/Buenos_Aires";
+            //se intenta establecer la conexión
+            this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
+         }
+         catch (SQLException ex)
+         {
+            JOptionPane.showMessageDialog(this,
+                        "Se produjo un error al intentar conectarse a la base de datos.\n" + 
+                         ex.getMessage(),
+                         "Error",
+                         JOptionPane.ERROR_MESSAGE);
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+         }
+      }
+   }
 
+   private void desconectarBD()
+   {
+      if (this.conexionBD != null)
+      {
+         try
+         {
+            this.conexionBD.close();
+            this.conexionBD = null;
+         }
+         catch (SQLException ex)
+         {
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+         }
+      }
+   }
    
    
 
