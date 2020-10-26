@@ -43,16 +43,17 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
 
    
    
-   public VentanaConsultas() 
+   public VentanaConsultas(Connection conexion) 
    {
       super();
+      conexionBD = conexion;
       initGUI();
+      
    }
    
    private void initGUI() 
    {
       try {
-    	conectarBD();
       	// crea la tabla  
       	tabla = new DBTable();   
     	  
@@ -206,35 +207,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
       
    }
    
-   
-   private void conectarBD()
-   {
-      if (this.conexionBD == null)
-      {             
-         try
-         {  //se genera el string que define los datos de la conexión 
-            String servidor = "localhost:3306";
-            String baseDatos = "parquimetros";
-            String usuario = "admin";
-            String clave = "admin";
-            String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos + 
-            		          "?serverTimezone=America/Argentina/Buenos_Aires";
-            //se intenta establecer la conexión
-            this.conexionBD = DriverManager.getConnection(uriConexion, usuario, clave);
-         }
-         catch (SQLException ex)
-         {
-            JOptionPane.showMessageDialog(this,
-                        "Se produjo un error al intentar conectarse a la base de datos.\n" + 
-                         ex.getMessage(),
-                         "Error",
-                         JOptionPane.ERROR_MESSAGE);
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
-         }
-      }
-   }
+  
 
    private void desconectarBD()
    {

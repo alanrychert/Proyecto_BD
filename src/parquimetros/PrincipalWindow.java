@@ -87,7 +87,7 @@ public class PrincipalWindow {
 	
 	
 	private void mniConsultasActionPerformed(){
-		this.consultasAdmin = new VentanaConsultas();
+		this.consultasAdmin = new VentanaConsultas(conexionBD);
 	    this.consultasAdmin.setVisible(false);
 	    this.desktopPane.add(this.consultasAdmin);
 	    try{
@@ -99,6 +99,7 @@ public class PrincipalWindow {
 	
 	public void mostrarPanelLogin(JFrame frame) {
 	    Hashtable<String, String> logininformation = new Hashtable<String, String>();
+	    final JLabel usuarioLabel =new JLabel("Legajo", SwingConstants.RIGHT);
 	    
 	    
 	    JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
@@ -129,14 +130,16 @@ public class PrincipalWindow {
 			public void actionPerformed(ActionEvent arg0) {
 				username.setText("");
 				username.setEditable(true);
+				usuarioLabel.setText("Legajo");
 			}
 	    	
 	    });
 	    botonAdmin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				username.setText("Admin");
+				username.setText("admin");
 				username.setEditable(false);
+				usuarioLabel.setText("");
 			}	
 	    	
 	    });
@@ -145,7 +148,7 @@ public class PrincipalWindow {
 	    tipoUsuario.add(botonAdmin);
 
 	    JPanel label = new JPanel(new GridLayout(0, 1, 2, 2));
-	    label.add(new JLabel("Usuario", SwingConstants.RIGHT));
+	    label.add(usuarioLabel);
 	    label.add(new JLabel("Password", SwingConstants.RIGHT));
 	   
 
@@ -156,46 +159,25 @@ public class PrincipalWindow {
 	    
 	  
 	    
-	    int resultado= JOptionPane.showConfirmDialog(frame, panel, "login", JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+	    int resultado= JOptionPane.showOptionDialog(frame, panel, "login", 
+	    		JOptionPane.YES_NO_OPTION,
+	    		JOptionPane.QUESTION_MESSAGE,
+	    		null,	//icono predeterminado
+	    		new Object[] {"Login","Cancelar"},
+	    		"Login"
+	    		);
 
 	    if(resultado == JOptionPane.YES_OPTION) {
-	    	conectarBD();
-	    	if(botonAdmin.isSelected()) {
-	    		mniConsultasActionPerformed();
-	    		
-	    		///ACA FALTA CONTROLAR LA CONTRASEÑA DEL ADMIN
-	    		
+	    	conectarBD(username.getText(),new String(password.getPassword()));
+	    	if(conexionBD!=null) {
+	    		if(botonAdmin.isSelected()) {
+	    			mniConsultasActionPerformed();
+	    		}
+	    		else {
+	    			//ACA IRIA LA VENTANA 
+	    			JOptionPane.showMessageDialog(frame, "se ingreso correctamente");
+	    		}
 	    	}
-	    	else {
-	    		try {
-					if(conexionBD.isValid(3)) {
-						Statement st= conexionBD.createStatement();
-						ResultSet rs = st.executeQuery("select * from inspectores where legajo='"+username.getText()+"' and password='"+new String(password.getPassword())+"'");
-						
-						//LA CONSULTA NO DEBERIA SER ASI REVIAR LO DE MD5 PARA CONSULTAS SOBRE CONTRASEÑAS EN EL ENUNCIADO
-						if(rs.next()) {
-							JOptionPane.showMessageDialog(frame,"Se accedio ccorrectamente.\n","estado",JOptionPane.QUESTION_MESSAGE);
-						}
-						else {
-							JOptionPane.showMessageDialog(frame,"El usuario ingresado es incorrecto.\n","estado",JOptionPane.ERROR_MESSAGE);
-						}
-					}
-					else {
-						
-					}
-				} catch (SQLException ex) {
-					JOptionPane.showMessageDialog(frame,
-	                        "Se produjo un error al intentar conectarse a la base de datos.\n" + 
-	                         ex.getMessage(),
-	                         "Error",
-	                         JOptionPane.ERROR_MESSAGE);
-					System.out.println("SQLException: " + ex.getMessage());
-					System.out.println("SQLState: " + ex.getSQLState());
-					System.out.println("VendorError: " + ex.getErrorCode());
-				}
-	    	}
-	    	desconectarBD();
-	    	
 	    }
 	    
 	    logininformation.put("user", username.getText());
@@ -205,7 +187,7 @@ public class PrincipalWindow {
 	    
 	}
 	
-	private void conectarBD()
+	private void conectarBD(String usuario,String clave)
 	   {
 	      if (this.conexionBD == null)
 	      {             
@@ -213,8 +195,6 @@ public class PrincipalWindow {
 	         {  //se genera el string que define los datos de la conexión 
 	            String servidor = "localhost:3306";
 	            String baseDatos = "parquimetros";
-	            String usuario = "admin";
-	            String clave = "admin";
 	            String uriConexion = "jdbc:mysql://" + servidor + "/" + baseDatos + 
 	            		          "?serverTimezone=America/Argentina/Buenos_Aires";
 	            //se intenta establecer la conexión
