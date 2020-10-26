@@ -119,7 +119,6 @@ public class PrincipalWindow {
 	   }
 	
 	public void mostrarPanelLogin(JFrame frame) {
-	    Hashtable<String, String> logininformation = new Hashtable<String, String>();
 	    final JLabel usuarioLabel =new JLabel("Legajo", SwingConstants.RIGHT);
 	    
 	    
@@ -188,23 +187,38 @@ public class PrincipalWindow {
 	    		"Login"
 	    		);
 
-	    if(resultado == JOptionPane.YES_OPTION) {
-	    	conectarBD(username.getText(),new String(password.getPassword()));
-	    	if(conexionBD!=null) {
-	    		if(botonAdmin.isSelected()) {
+	    if(resultado == JOptionPane.YES_OPTION) {	    
+	    	if(botonAdmin.isSelected()) {
+	    		conectarBD(username.getText(),new String(password.getPassword()));
+	    		if(conexionBD!=null) {
 	    			mniConsultasActionPerformed();
 	    		}
-	    		else {
-	    			//ACA IRIA LA VENTANA 
-	    			JOptionPane.showMessageDialog(frame, "se ingreso correctamente");
-	    		}
 	    	}
-	    }
-	    
-	    logininformation.put("user", username.getText());
-	    logininformation.put("pass", new String(password.getPassword()));
-	    
-	    
+	    	else {
+	    		conectarBD("inspector","inspector");
+	    		try {
+					if(conexionBD.isValid(5)) {
+						Statement st= conexionBD.createStatement();
+						ResultSet rs = st.executeQuery(
+								" select * from inspectores where legajo="+username.getText()+
+								" and password=md5('"+new String(password.getPassword())+"');");
+						if(rs.next()) {
+							//ACA IRIA LA VENTANA 
+				   			JOptionPane.showMessageDialog(frame, "se ingreso correctamente");
+							
+						}	
+					}				
+				} catch (SQLException ex) {
+					JOptionPane.showMessageDialog(frame,
+		                       "Usuario o contraseña incorrecto" + 
+		                        ex.getMessage(),
+		                        "Error",
+		                        JOptionPane.ERROR_MESSAGE);
+				}
+	    		
+	   		}
+	   	}
+  
 	    
 	}
 	
