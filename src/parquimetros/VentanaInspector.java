@@ -219,7 +219,8 @@ public class VentanaInspector extends javax.swing.JInternalFrame
          Statement stmt = this.conexionBD.createStatement();
 
          // se prepara el string SQL de la consulta
-         String sql = "SELECT * FROM estacionados;";
+         String sql = "SELECT calle,altura,id_parq FROM parquimetros WHERE LOWER(calle) LIKE '%"+ 
+                 this.txtNombre.getText().trim().toLowerCase() + "%' ";
 
          // se ejecuta la sentencia y se recibe un resultset
          ResultSet rs = stmt.executeQuery(sql);
@@ -233,7 +234,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
             // se agregan a la tabla los datos correspondientes cada celda de la fila recuperada
             this.tabla.setValueAt(rs.getString("calle"), i, 0);
             this.tabla.setValueAt(rs.getInt("altura"), i, 1);            
-            this.tabla.setValueAt(rs.getString("patente"), i, 2);
+            this.tabla.setValueAt(rs.getString("id_parq"), i, 2);
             i++;
          }
          // se cierran los recursos utilizados 
