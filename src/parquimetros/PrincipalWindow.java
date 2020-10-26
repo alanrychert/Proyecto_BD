@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.Hashtable;
 
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -34,14 +35,15 @@ public class PrincipalWindow {
 
 	private JFrame frame;
 	private JDesktopPane desktopPane;
-	private VentanaConsultas consultasAdmin;
-	private final String usuarioAdmin="ADMIN";
-	private final String usuarioInspector="INSPECTOR";
+	private JInternalFrame ventanaPrincipal;
+	
 	protected Connection conexionBD = null;
+	
 	private JMenuBar jMenuBar1;
 	private JMenu mnuOpciones;
 	private JMenuItem mniLogin;
 	private JMenuItem mniLogout;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -107,15 +109,14 @@ public class PrincipalWindow {
 	}
 	
 	
-	private void mniConsultasActionPerformed(){
-		this.consultasAdmin = new VentanaConsultas(conexionBD);
-	    this.consultasAdmin.setVisible(false);
-	    this.desktopPane.add(this.consultasAdmin);
+	private void cargarVentanaPrincipal(JInternalFrame ventana){
+		this.ventanaPrincipal = ventana;
+	    this.desktopPane.add(this.ventanaPrincipal);
 	    try{
-	        this.consultasAdmin.setMaximum(true);
+	        this.ventanaPrincipal.setMaximum(true);
 	    }
 	    catch (PropertyVetoException e) {}
-	    this.consultasAdmin.setVisible(true);      
+	    this.ventanaPrincipal.setVisible(true);      
 	   }
 	
 	public void mostrarPanelLogin(JFrame frame) {
@@ -131,12 +132,9 @@ public class PrincipalWindow {
 	    JPanel panel = new JPanel(new BorderLayout(5, 5));
 	    JPanel tipoUsuario = new JPanel(new GridLayout(0, 1, 2, 2));
 	    
-	    JRadioButton botonAdmin = new JRadioButton(usuarioAdmin);
-	    botonAdmin.setActionCommand(usuarioAdmin);
+	    JRadioButton botonAdmin = new JRadioButton("Administrador");
 	    
-
-	    JRadioButton botonUsuario = new JRadioButton(usuarioInspector);
-	    botonUsuario.setActionCommand(usuarioInspector);
+	    JRadioButton botonUsuario = new JRadioButton("Inspector");
 	    botonUsuario.setSelected(true);
 
 	    //Group the radio buttons.
@@ -179,7 +177,7 @@ public class PrincipalWindow {
 	    
 	  
 	    
-	    int resultado= JOptionPane.showOptionDialog(frame, panel, "login", 
+	    int resultado= JOptionPane.showOptionDialog(frame, panel, "Iniciar Sesion", 
 	    		JOptionPane.YES_NO_OPTION,
 	    		JOptionPane.QUESTION_MESSAGE,
 	    		null,	//icono predeterminado
@@ -191,11 +189,13 @@ public class PrincipalWindow {
 	    	if(botonAdmin.isSelected()) {
 	    		conectarBD(username.getText(),new String(password.getPassword()));
 	    		if(conexionBD!=null) {
-	    			mniConsultasActionPerformed();
+	    			cargarVentanaPrincipal(new VentanaConsultas(conexionBD));
 	    		}
 	    	}
 	    	else {
 	    		conectarBD("inspector","inspector");
+	    		//PREGUNTAR SI ESTA BIEN QUE ESTO ESTE HARDCODEADO ACA
+	    		
 	    		try {
 					if(conexionBD.isValid(5)) {
 						Statement st= conexionBD.createStatement();
@@ -204,8 +204,8 @@ public class PrincipalWindow {
 								" and password=md5('"+new String(password.getPassword())+"');");
 						if(rs.next()) {
 							//ACA IRIA LA VENTANA 
-				   			JOptionPane.showMessageDialog(frame, "se ingreso correctamente");
-							
+							cargarVentanaPrincipal(new VentanaInspector(conexionBD));
+				   			JOptionPane.showMessageDialog(frame, "se ingreso correctamente");					
 						}	
 					}				
 				} catch (SQLException ex) {
