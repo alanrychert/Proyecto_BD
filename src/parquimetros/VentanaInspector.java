@@ -305,6 +305,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			Statement st;
 			try {
 				if(conexionBD.isValid(3)) {
+					Calendar hoy = Calendar.getInstance();
 					st = conexionBD.createStatement();
 					ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
 					
@@ -323,17 +324,16 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 					}
 					
 					DefaultTableModel tablaMultas = crearTabla();
-					String fecha = Calendar.DAY_OF_YEAR+"/"+Calendar.MONTH+"/"+Calendar.DATE;
-					String hora = Calendar.HOUR_OF_DAY+":"+Calendar.MINUTE+":"+Calendar.SECOND;
+					String fecha = hoy.get(Calendar.YEAR)+"/"+hoy.get(Calendar.MONTH)+"/"+hoy.get(Calendar.DATE);
+					String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
 					for(String patente:tieneMulta) {
 						st = conexionBD.createStatement();
 						
-						System.out.println("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\","+patente+","+inspector+");");
-						st.executeQuery("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\","+patente+","+inspector+");");
-						rs = st.executeQuery("SELECT LAS_INSERT_ID();");//se obtiene el ultimo id modificado, en este caso el numero de multa
-						rs.first();
-						
-						Object[] fila = {rs.getInt(0),fecha,hora,patente,inspector};
+						System.out.println("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
+						st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
+						rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
+
+						String[] fila = {rs.getInt(1)+"",fecha,hora,"calle aux","altura aux",patente,inspector+""};
 						tablaMultas.addRow(fila);
 					}
 					
