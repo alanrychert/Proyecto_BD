@@ -332,8 +332,10 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 						System.out.println("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
 						st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
 						rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
-
-						String[] fila = {rs.getInt(1)+"",fecha,hora,"calle aux","altura aux",patente,inspector+""};
+						
+						rs.next();
+						int nroMulta = rs.getInt(1);
+						String[] fila = {nroMulta+"",fecha,hora,"calle aux","altura aux",patente,inspector+""};
 						tablaMultas.addRow(fila);
 					}
 					
