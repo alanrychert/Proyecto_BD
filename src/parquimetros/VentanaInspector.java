@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -135,9 +136,14 @@ public class VentanaInspector extends javax.swing.JInternalFrame
          this.seleccionarFila();
       }
    }
+   
    private void seleccionarFila()
    {
       int seleccionado = this.tabla.getSelectedRow();
+      
+      this.lblCalleSelec.setText( this.tabla.getValueAt(seleccionado, 0).toString());
+      this.lblAlturaSelec.setText( this.tabla.getValueAt(seleccionado, 1).toString());
+      this.lblIdParqSelec.setText( this.tabla.getValueAt(seleccionado, 2).toString());
       
       //ACA SE CAMBIARIA UN CUADRO DE TEXTO CON EL IDE DEL PARQUIMETRO 
       //this.txtNombre.setText(this.tabla.getValueAt(this.tabla.getSelectedRow(), 0).toString());
@@ -295,14 +301,16 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   
 	   
 	   //-----------------------------------------------------
-	   //L1 TIENE QUE ESTAR EN UN SCROLLPANE
+	   // List TIENE QUE ESTAR EN UN SCROLLPANE
 	   //-----------------------------------------------------
 	   
-	   
+	   JScrollPane jspListaPatentes = new JScrollPane();
 	   
 	   l1 = new DefaultListModel<String>();
 	   l1.addElement("Elemento de prueba");
-	   JList<String> list = new JList<String>(l1);  
+	   
+	   JList<String> list = new JList<String>(l1);
+	   jspListaPatentes.setViewportView(list);
 	   
 	   JPanel agregarPanel = new JPanel();
 	   JButton agregarPatenteBoton = new JButton();
@@ -328,10 +336,47 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   tituloLabel.setAlignmentX(CENTER_ALIGNMENT);
 	   
 	   panelPatentes.add(tituloLabel,BorderLayout.NORTH);
-	   panelPatentes.add(list,BorderLayout.CENTER);
+	   panelPatentes.add(jspListaPatentes,BorderLayout.CENTER);
 	   panelPatentes.add(agregarPanel,BorderLayout.SOUTH);
 	   panelTablaFiltro.add(panelPatentes);
-	   
-	   
    }
+   
+   private boolean verificarHorario(String turno) {
+	   return true;
+   }
+   
+   private void cargarAcceso() {
+	   int horario,dia;
+	   String diaString,turno;
+	   horario=Calendar.HOUR_OF_DAY*10000+Calendar.MINUTE*100+Calendar.SECOND;
+	   if (horario<125959)
+		   turno="m";
+	   else
+		   turno="t";
+	   dia=Calendar.DAY_OF_WEEK;
+	   switch (dia) {
+	    case 1:diaString="do";
+	   	case 2:diaString="lu";
+	   	case 3:diaString="ma";
+	   	case 4:diaString="mi";
+	   	case 5:diaString="ju";
+	   	case 6:diaString="vi";
+	   	case 7:diaString="sa";
+	   }
+	   Statement st;
+	   try {
+		   if (conexionBD.isValid(3)) {
+			st = conexionBD.createStatement();
+			
+			st.executeQuery("Select * from asociado_con where dia="+dia+" and turno="+turno+" and legajo=legajo and calle="+lblCalleSelec.getText()+" and altura="+lblAlturaSelec.getText());
+			//st.executeQuery("INSERT INTO accede VALUES(1,1111,""\"2020/01/01\",\"01:00:00\");");
+		   }
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+   }
+   
+   
 }
