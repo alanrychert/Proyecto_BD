@@ -306,15 +306,13 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			try {
 				if(conexionBD.isValid(3)) {
 					st = conexionBD.createStatement();
-					st.executeQuery("INSERT INTO accede VALUES(1,1111,\"2020/01/01\",\"01:00:00\");");
-					
-					ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec);
+					ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
 					
 					ArrayList<String> tieneMulta = new ArrayList<String>();
 					ArrayList<String> registrado = new ArrayList<String>();
 					
 					while(rs.next()) {
-						registrado.add(rs.getString(0));
+						registrado.add(rs.getString(1));
 					}
 					
 					for(Object p:patentes) {
@@ -328,8 +326,10 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 					String fecha = Calendar.DAY_OF_YEAR+"/"+Calendar.MONTH+"/"+Calendar.DATE;
 					String hora = Calendar.HOUR_OF_DAY+":"+Calendar.MINUTE+":"+Calendar.SECOND;
 					for(String patente:tieneMulta) {
+						st = conexionBD.createStatement();
 						
-						st.executeQuery("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES('"+fecha+"','"+hora+"','"+patente+"',"+inspector+");");
+						System.out.println("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\","+patente+","+inspector+");");
+						st.executeQuery("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\","+patente+","+inspector+");");
 						rs = st.executeQuery("SELECT LAS_INSERT_ID();");//se obtiene el ultimo id modificado, en este caso el numero de multa
 						rs.first();
 						
@@ -349,7 +349,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 				e.printStackTrace();
 			}
 
-			registrarAcceso();
+			//registrarAcceso();
 			
 		}
 		   
@@ -384,7 +384,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   JScrollPane jspListaPatentes = new JScrollPane();
 	   
 	   l1 = new DefaultListModel<String>();
-	   l1.addElement("Elemento de prueba");
+	   //l1.addElement("Elemento de prueba");
 	   
 	   JList<String> list = new JList<String>(l1);
 	   jspListaPatentes.setViewportView(list);
