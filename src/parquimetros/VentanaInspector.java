@@ -23,6 +23,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -42,7 +43,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
    private JTextField txtNombre;
    private JTable tabla;
    private JLabel lblNombre;
-   private JPanel panelTablaFiltro;
+   private JPanel panelTablaFiltro,panelMultas;
    private JPanel panelSeleccionados;
    private JLabel lblCalleSelec;
    private JLabel lblAlturaSelec;
@@ -300,7 +301,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			String[] patentes= (String[])l1.toArray();
+			Object[] patentes= l1.toArray();
 			Statement st;
 			try {
 				if(conexionBD.isValid(3)) {
@@ -316,22 +317,28 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 						registrado.add(rs.getString(0));
 					}
 					
-					for(String p:patentes) {
+					for(Object p:patentes) {
+						System.out.println(p.toString());
 						if(!registrado.contains(p)) {
-							tieneMulta.add(p);
+							tieneMulta.add(p.toString());
 						}
 					}
 					
 					DefaultTableModel tablaMultas = crearTabla();
-					for(String p:tieneMulta) {
-						//ACA HAY QUE AGREGAR LAS MULTAS
-						//st.executeQuery(INSERT INTO multa ("fecha,hora,patente,id_asociado_con) VALUES("2020/01/01","05:11:11","AAA555",4);");
+					String fecha = Calendar.DAY_OF_YEAR+"/"+Calendar.MONTH+"/"+Calendar.DATE;
+					String hora = Calendar.HOUR_OF_DAY+":"+Calendar.MINUTE+":"+Calendar.SECOND;
+					for(String patente:tieneMulta) {
 						
-						//ResultSet nroMulta = st.executeQuery("SELECT LAS_INSERT_ID();");
+						st.executeQuery("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES('"+fecha+"','"+hora+"','"+patente+"',"+inspector+");");
+						rs = st.executeQuery("SELECT LAS_INSERT_ID();");//se obtiene el ultimo id modificado, en este caso el numero de multa
 						rs.first();
-						int numeroMulta = rs.getInt(0);
 						
+						Object[] fila = {rs.getInt(0),fecha,hora,patente,inspector};
+						tablaMultas.addRow(fila);
 					}
+					
+					JOptionPane.showConfirmDialog(null,panelMultas, "multas realizadas",JOptionPane.INFORMATION_MESSAGE);
+					
 						
 				}
 				
@@ -364,7 +371,8 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   modelo.addColumn("altura");
 	   modelo.addColumn("patente");
 	   modelo.addColumn("legajo ins.");
-	   
+	   panelMultas = new JPanel();
+	   panelMultas.add(tabla);
 	   return modelo;
 	   
    }
@@ -417,11 +425,11 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   String diaString="";
 	   String turno="nada";
 	   
-	   horario=Calendar.HOUR_OF_DAY*10000+Calendar.MINUTE*100+Calendar.SECOND;
-	   if (horario>= 80000 && horario<=125959)
+	   horario=Calendar.HOUR_OF_DAY;
+	   if (horario>= 8 && horario<=13)
 		   turno="m";
 	   else
-		   if (horario<=20000)
+		   if (horario<=19)
 			   turno="t";
 	   dia=Calendar.DAY_OF_WEEK;
 	   fecha=Calendar.YEAR;
