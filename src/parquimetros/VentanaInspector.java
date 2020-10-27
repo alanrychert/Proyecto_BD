@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -294,6 +295,46 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			String[] patentes= (String[])l1.toArray();
+			Statement st;
+			try {
+				if(conexionBD.isValid(3)) {
+					st = conexionBD.createStatement();
+					st.executeQuery("INSERT INTO accede VALUES(1,1111,\"2020/01/01\",\"01:00:00\");");
+					
+					ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec);
+					
+					ArrayList<String> tieneMulta = new ArrayList<String>();
+					ArrayList<String> registrado = new ArrayList<String>();
+					
+					while(rs.next()) {
+						registrado.add(rs.getString(0));
+					}
+					
+					for(String p:patentes) {
+						if(!registrado.contains(p)) {
+							tieneMulta.add(p);
+						}
+					}
+					
+					DefaultTableModel tablaMultas = crearTabla();
+					for(String p:tieneMulta) {
+						//ACA HAY QUE AGREGAR LAS MULTAS
+						//st.executeQuery(INSERT INTO multa ("fecha,hora,patente,id_asociado_con) VALUES("2020/01/01","05:11:11","AAA555",4);");
+						
+						//ResultSet nroMulta = st.executeQuery("SELECT LAS_INSERT_ID();");
+						rs.first();
+						int numeroMulta = rs.getInt(0);
+						
+					}
+						
+				}
+				
+				
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}
 		   
@@ -301,6 +342,22 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   
 	   getContentPane().add(panelSeleccionados,BorderLayout.SOUTH);
 	   
+	   
+   }
+   
+   private DefaultTableModel crearTabla() {
+	   DefaultTableModel modelo = new DefaultTableModel();
+	   JTable tabla = new JTable(modelo);
+	   
+	   modelo.addColumn("nro multa");
+	   modelo.addColumn("fecha");
+	   modelo.addColumn("hora");
+	   modelo.addColumn("calle");
+	   modelo.addColumn("altura");
+	   modelo.addColumn("patente");
+	   modelo.addColumn("legajo ins.");
+	   
+	   return modelo;
 	   
    }
 
