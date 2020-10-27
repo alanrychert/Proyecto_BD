@@ -204,7 +204,8 @@ public class PrincipalWindow {
 								" and password=md5('"+new String(password.getPassword())+"');");
 						if(rs.next()) {
 							//ACA IRIA LA VENTANA 
-							cargarVentanaPrincipal(new VentanaInspector(conexionBD));
+							int legajo = Integer.parseInt(username.getText());
+							cargarVentanaPrincipal(new VentanaInspector(conexionBD,legajo));
 				   			JOptionPane.showMessageDialog(frame, "se ingreso correctamente");					
 						}	
 					}				
