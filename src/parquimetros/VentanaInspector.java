@@ -339,7 +339,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 						tablaMultas.addRow(fila);
 					}
 					
-					JOptionPane.showConfirmDialog(null,panelMultas, "multas realizadas",JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null,panelMultas, "Multas realizadas",JOptionPane.INFORMATION_MESSAGE);
 					
 						
 				}
