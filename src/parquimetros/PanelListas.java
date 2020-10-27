@@ -48,15 +48,16 @@ public class PanelListas extends JPanel {
 		ArrayList <String> listaT= new ArrayList<String>();
 		
 		try {
-		while(!conexionBD.isValid(1)) {}
-		Statement st= conexionBD.createStatement();
-		ResultSet rs = st.executeQuery("show tables");
-		
-		while (rs.next()) {
-			listaT.add( rs.getString(1));
-		}
-		st.close();
-		rs.close();
+			if(conexionBD.isValid(5)) {
+				Statement st= conexionBD.createStatement();
+				ResultSet rs = st.executeQuery("show tables");
+				
+				while (rs.next()) {
+					listaT.add( rs.getString(1));
+				}
+				st.close();
+				rs.close();
+			}
 		}catch (SQLException ex)
 	      {
 	         System.out.println("SQLException: " + ex.getMessage());

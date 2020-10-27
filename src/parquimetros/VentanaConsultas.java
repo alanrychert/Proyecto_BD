@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 //import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -25,7 +26,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-
 import quick.dbtable.*; 
 
 
@@ -33,7 +33,7 @@ import quick.dbtable.*;
 public class VentanaConsultas extends javax.swing.JInternalFrame 
 {
    private JPanel pnlConsulta;
-   private JTextArea txtConsulta;
+   private JTextArea txtInput;
    private JButton botonBorrar;
    private JButton btnEjecutar;
    private DBTable tabla;    
@@ -56,6 +56,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
       try {
       	// crea la tabla  
       	tabla = new DBTable();   
+      	tabla.setConnection(conexionBD);
     	  
          setPreferredSize(new Dimension(800, 600));
          this.setBounds(0, 0, 800, 600);
@@ -83,18 +84,18 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
                scrConsulta = new JScrollPane();
                pnlConsulta.add(scrConsulta);
                {
-                  txtConsulta = new JTextArea();
-                  scrConsulta.setViewportView(txtConsulta);
-                  txtConsulta.setTabSize(3);
-                  txtConsulta.setColumns(80);
-                  txtConsulta.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
-                  txtConsulta.setText("SELECT t.fecha, t.nombre_batalla, b.nombre_barco, b.id, b.capitan, r.resultado \n" +
+                  txtInput = new JTextArea();
+                  scrConsulta.setViewportView(txtInput);
+                  txtInput.setTabSize(3);
+                  txtInput.setColumns(80);
+                  txtInput.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
+                  txtInput.setText("SELECT t.fecha, t.nombre_batalla, b.nombre_barco, b.id, b.capitan, r.resultado \n" +
                                       "FROM batallas t, resultados r, barcos b \n" +
                                       "WHERE t.nombre_batalla = r.nombre_batalla \n" +
                                       "AND r.nombre_barco = b.nombre_barco \n" +
                                       "ORDER BY t.fecha, t.nombre_batalla, b.nombre_barco");
-                  txtConsulta.setFont(new java.awt.Font("Monospaced",0,12));
-                  txtConsulta.setRows(10);
+                  txtInput.setFont(new java.awt.Font("Monospaced",0,12));
+                  txtInput.setRows(10);
                }
             }
             {
@@ -113,7 +114,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
             	botonBorrar.setText("Borrar");            
             	botonBorrar.addActionListener(new ActionListener() {
             		public void actionPerformed(ActionEvent arg0) {
-            		  txtConsulta.setText("");            			
+            		  txtInput.setText("");            			
             		}
             	});
             }	
@@ -157,7 +158,16 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
 
    private void btnEjecutarActionPerformed(ActionEvent evt) 
    {
-      this.refrescarTabla();      
+	  String[] palabras= this.txtInput.getText().split(" ");
+	  String primerP = palabras[0].toUpperCase();
+	  if (primerP.contentEquals("UPDATE") || primerP.contentEquals("CREATE") || primerP.contentEquals("INSERT")|| primerP.contentEquals("DELETE")
+			  || primerP.contentEquals("DROP")) 
+	  {
+		  this.ejecutar();
+	  }
+	  else {
+		  this.refrescarTabla();  
+	  }
    }
    
 
@@ -166,7 +176,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
       try
       {    
     	 // seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
-    	 tabla.setSelectSql(this.txtConsulta.getText().trim());
+    	 tabla.setSelectSql(this.txtInput.getText().trim());
 
     	  // obtenemos el modelo de la tabla a partir de la consulta para 
     	  // modificar la forma en que se muestran algunas columnas  
@@ -207,8 +217,25 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
       
    }
    
-  
-
+   private void ejecutar() {
+      try
+      {
+         Statement stmt = this.conexionBD.createStatement();
+         String sql = txtInput.getText().trim();
+         stmt.execute(sql);
+         stmt.close();
+      }
+      catch (SQLException ex)
+      {
+         JOptionPane.showMessageDialog(this,
+                                       "Se produjo un error.\n" + ex.getMessage(),
+                                       "Error",
+                                       JOptionPane.ERROR_MESSAGE);
+      }
+	   
+   }
+   
+   
    private void desconectarBD()
    {
       if (this.conexionBD != null)
