@@ -49,14 +49,17 @@ public class VentanaInspector extends javax.swing.JInternalFrame
    private JButton btnVerificar;
    private JPanel panelPatentes;
    private DefaultListModel<String> l1;
+   protected int inspector;
    
    protected Connection conexionBD = null;
 
-   public VentanaInspector(Connection conexion) 
+   public VentanaInspector(Connection conexion, int legajo) 
    {
       super();
       conexionBD = conexion;
+      inspector = legajo;
       initGUI();
+      
    }
    
    private void initGUI() 
@@ -292,7 +295,18 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   panelSeleccionados.add(lblIdParqSelec);
 	   panelSeleccionados.add(btnVerificar);
 	   
+	   btnVerificar.addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			String[] patentes= (String[])l1.toArray();
+			
+		}
+		   
+	   });
+	   
 	   getContentPane().add(panelSeleccionados,BorderLayout.SOUTH);
+	   
 	   
    }
 
