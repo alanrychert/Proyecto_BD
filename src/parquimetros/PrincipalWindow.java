@@ -38,7 +38,6 @@ public class PrincipalWindow {
 	private JInternalFrame ventanaPrincipal;
 	
 	protected Connection conexionBD = null;
-	
 	private JMenuBar jMenuBar1;
 	private JMenu mnuOpciones;
 	private JMenuItem mniLogin;

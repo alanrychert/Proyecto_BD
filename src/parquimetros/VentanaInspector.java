@@ -300,6 +300,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			String[] patentes= (String[])l1.toArray();
+			registrarAcceso();
 			
 		}
 		   
@@ -313,11 +314,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
    private void crearPanelPatentes() { 
 	   panelPatentes= new JPanel(new BorderLayout());
 	   
-	   
-	   //-----------------------------------------------------
-	   // List TIENE QUE ESTAR EN UN SCROLLPANE
-	   //-----------------------------------------------------
-	   
+
 	   JScrollPane jspListaPatentes = new JScrollPane();
 	   
 	   l1 = new DefaultListModel<String>();
@@ -355,19 +352,21 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   panelTablaFiltro.add(panelPatentes);
    }
    
-   private boolean verificarHorario(String turno) {
-	   return true;
-   }
    
-   private void cargarAcceso() {
-	   int horario,dia;
-	   String diaString,turno;
+   private void registrarAcceso() {
+	   int horario,dia,fecha;
+	   int idParq = Integer.parseInt(lblIdParqSelec.getText());
+	   String diaString="";
+	   String turno="nada";
+	   
 	   horario=Calendar.HOUR_OF_DAY*10000+Calendar.MINUTE*100+Calendar.SECOND;
-	   if (horario<125959)
+	   if (horario>= 80000 && horario<=125959)
 		   turno="m";
 	   else
-		   turno="t";
+		   if (horario<=20000)
+			   turno="t";
 	   dia=Calendar.DAY_OF_WEEK;
+	   fecha=Calendar.YEAR;
 	   switch (dia) {
 	    case 1:diaString="do";
 	   	case 2:diaString="lu";
@@ -382,8 +381,13 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		   if (conexionBD.isValid(3)) {
 			st = conexionBD.createStatement();
 			
-			st.executeQuery("Select * from asociado_con where dia="+dia+" and turno="+turno+" and legajo=legajo and calle="+lblCalleSelec.getText()+" and altura="+lblAlturaSelec.getText());
-			//st.executeQuery("INSERT INTO accede VALUES(1,1111,""\"2020/01/01\",\"01:00:00\");");
+			ResultSet rs=st.executeQuery("Select * from asociado_con where dia='"+dia+"' and turno='"+turno+"' and legajo="+inspector+" and calle='"+lblCalleSelec.getText()+"' and altura="+lblAlturaSelec.getText());
+			if (rs.next()) {
+				//st.executeQuery("INSERT INTO accede VALUES("+idParq+","+inspector+",\"2020/01/01\",\"01:00:00\");");
+			}
+			else {
+				System.out.println("hay un error (no hay ningun parquimetro en esa ubicacion, altura, dia y turno que corresponda a este inspector)");
+			}
 		   }
 			
 		} catch (SQLException e) {
