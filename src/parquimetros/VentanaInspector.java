@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -306,42 +307,44 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			try {
 				if(conexionBD.isValid(3)) {
 					Calendar hoy = Calendar.getInstance();
-					st = conexionBD.createStatement();
-					ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
+					if (registrarAcceso(hoy)) {
 					
-					ArrayList<String> tieneMulta = new ArrayList<String>();
-					ArrayList<String> registrado = new ArrayList<String>();
-					
-					while(rs.next()) {
-						registrado.add(rs.getString(1));
-					}
-					
-					for(Object p:patentes) {
-						System.out.println(p.toString());
-						if(!registrado.contains(p)) {
-							tieneMulta.add(p.toString());
-						}
-					}
-					
-					DefaultTableModel tablaMultas = crearTabla();
-					String fecha = hoy.get(Calendar.YEAR)+"/"+hoy.get(Calendar.MONTH)+"/"+hoy.get(Calendar.DATE);
-					String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
-					for(String patente:tieneMulta) {
 						st = conexionBD.createStatement();
+						ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
 						
-						System.out.println("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
-						st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
-						rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
+						ArrayList<String> tieneMulta = new ArrayList<String>();
+						ArrayList<String> registrado = new ArrayList<String>();
 						
-						rs.next();
-						int nroMulta = rs.getInt(1);
-						String[] fila = {nroMulta+"",fecha,hora,"calle aux","altura aux",patente,inspector+""};
-						tablaMultas.addRow(fila);
+						while(rs.next()) {
+							registrado.add(rs.getString(1));
+						}
+						
+						for(Object p:patentes) {
+							System.out.println(p.toString());
+							if(!registrado.contains(p)) {
+								tieneMulta.add(p.toString());
+							}
+						}
+						
+						DefaultTableModel tablaMultas = crearTabla();
+						String fecha = hoy.get(Calendar.YEAR)+"/"+(hoy.get(Calendar.MONTH)+1)+"/"+hoy.get(Calendar.DATE);
+						String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
+						for(String patente:tieneMulta) {
+							st = conexionBD.createStatement();
+							
+							System.out.println("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
+							st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
+							rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
+							
+							rs.next();
+							int nroMulta = rs.getInt(1);
+							String[] fila = {nroMulta+"",fecha,hora,"calle aux","altura aux",patente,inspector+""};
+							tablaMultas.addRow(fila);
+						}
+						
+						JOptionPane.showMessageDialog(null,panelMultas, "Multas realizadas",JOptionPane.INFORMATION_MESSAGE);
+						
 					}
-					
-					JOptionPane.showMessageDialog(null,panelMultas, "Multas realizadas",JOptionPane.INFORMATION_MESSAGE);
-					
-						
 				}
 				
 				
@@ -421,27 +424,39 @@ public class VentanaInspector extends javax.swing.JInternalFrame
    }
    
    
-   private void registrarAcceso() {
-	   int horario,dia,fecha;
-	   int idParq = Integer.parseInt(lblIdParqSelec.getText());
-	   String diaString="";
+   private boolean registrarAcceso(Calendar hoy) {
+	   boolean registrado=false;
+	   
+	   int horario,dia;
+	   int idParq = Integer.parseInt(lblIdParqSelec.getText());	   
+	   
+	   String fecha = hoy.get(Calendar.YEAR)+"/"+(hoy.get(Calendar.MONTH)+1)+"/"+hoy.get(Calendar.DATE);
+	   String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
+	   String diaString="nada";
 	   String turno="nada";
 	   
 	   horario=Calendar.HOUR_OF_DAY;
+	   System.out.print(horario);
 	   if (horario>= 8 && horario<=13)
 		   turno="m";
 	   else
 		   if (horario<=19)
 			   turno="t";
-	   dia=Calendar.DAY_OF_WEEK;
-	   fecha=Calendar.YEAR;
+	   dia=hoy.get(Calendar.DAY_OF_WEEK);
+	   dia=3;
 	   switch (dia) {
 	    case 1:diaString="do";
+	    		break;
 	   	case 2:diaString="lu";
+	   			break;
 	   	case 3:diaString="ma";
+	   			break;
 	   	case 4:diaString="mi";
+	   			break;
 	   	case 5:diaString="ju";
+	   			break;
 	   	case 6:diaString="vi";
+	   			break;
 	   	case 7:diaString="sa";
 	   }
 	   Statement st;
@@ -449,12 +464,16 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		   if (conexionBD.isValid(3)) {
 			st = conexionBD.createStatement();
 			
-			ResultSet rs=st.executeQuery("Select * from asociado_con where dia='"+dia+"' and turno='"+turno+"' and legajo="+inspector+" and calle='"+lblCalleSelec.getText()+"' and altura="+lblAlturaSelec.getText());
+			ResultSet rs=st.executeQuery("Select * from asociado_con where dia='"+diaString+"' and turno='"+turno+"' and legajo="+inspector+" and calle='"+lblCalleSelec.getText().toString()+"' and altura="+Integer.parseInt(lblAlturaSelec.getText().toString()));
 			if (rs.next()) {
-				//st.executeQuery("INSERT INTO accede VALUES("+idParq+","+inspector+",\"2020/01/01\",\"01:00:00\");");
+				st.execute("INSERT INTO accede VALUES("+idParq+","+inspector+",\""+fecha+"\",\""+hora+"\");");
+				registrado=true;
 			}
 			else {
-				System.out.println("hay un error (no hay ningun parquimetro en esa ubicacion, altura, dia y turno que corresponda a este inspector)");
+				JOptionPane.showMessageDialog(this,
+                        "Este inspector no está asociado a esta ubicación en este horario. Dia="+diaString+" Horario="+turno+" Calle='"+lblCalleSelec.getText().toString()+"' altura="+lblAlturaSelec.getText().toString()+"'\n",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
 			}
 		   }
 			
@@ -462,6 +481,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	   return registrado;
    }
    
    
