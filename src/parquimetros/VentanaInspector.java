@@ -310,7 +310,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
                
 					if (registrarAcceso(hoy)) {
 				
-					//hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
+					    hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
 						st = conexionBD.createStatement();
 						ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
 						
@@ -437,7 +437,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   String diaString="nada";
 	   String turno="nada";
 	   
-	   horario=Calendar.HOUR_OF_DAY;
+	   horario=Calendar.HOUR_OF_DAY; //Sigue dando mal
 	   System.out.print(horario);
 	   if (horario>= 8 && horario<=13)
 		   turno="m";
@@ -445,7 +445,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		   if (horario<=19)
 			   turno="t";
 	   dia=hoy.get(Calendar.DAY_OF_WEEK);
-	   dia=3;
+	   //dia=3;
 	   switch (dia) {
 	    case 1:diaString="do";
 	    		break;
@@ -468,7 +468,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			
 			ResultSet rs=st.executeQuery("Select * from asociado_con where dia='"+diaString+"' and turno='"+turno+"' and legajo="+inspector+" and calle='"+lblCalleSelec.getText().toString()+"' and altura="+Integer.parseInt(lblAlturaSelec.getText().toString()));
 			if (rs.next()) {
-				st.execute("INSERT INTO accede VALUES("+idParq+","+inspector+",\""+fecha+"\",\""+hora+"\");");
+				st.execute("INSERT INTO accede VALUES("+inspector+","+idParq+",\""+fecha+"\",\""+hora+"\");");
 				registrado=true;
 			}
 			else {
