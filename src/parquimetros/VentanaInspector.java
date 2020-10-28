@@ -303,6 +303,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			Object[] patentes= l1.toArray();
+			l1.clear();
 			Statement st;
 			try {
 				if(conexionBD.isValid(3)) {
@@ -437,7 +438,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   String diaString="nada";
 	   String turno="nada";
 	   
-	   horario=Calendar.HOUR_OF_DAY; //Sigue dando mal
+	   horario=hoy.get(Calendar.HOUR_OF_DAY); //Sigue dando mal
 	   System.out.print(horario);
 	   if (horario>= 8 && horario<=13)
 		   turno="m";
@@ -473,7 +474,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			}
 			else {
 				JOptionPane.showMessageDialog(this,
-                        "Este inspector no est� asociado a esta ubicaci�n en este horario. Dia="+diaString+" Horario="+turno+" Calle='"+lblCalleSelec.getText().toString()+"' altura="+lblAlturaSelec.getText().toString()+"'\n",
+                        "Este inspector no esta asociado a esta ubicacion en este horario. Dia="+diaString+" Horario="+turno+" Calle='"+lblCalleSelec.getText().toString()+"' altura="+lblAlturaSelec.getText().toString()+"'\n",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
 			}
