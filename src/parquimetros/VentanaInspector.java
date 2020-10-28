@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -306,6 +307,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			try {
 				if(conexionBD.isValid(3)) {
 					Calendar hoy = Calendar.getInstance();
+					//hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
 					st = conexionBD.createStatement();
 					ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
 					
@@ -324,7 +326,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 					}
 					
 					DefaultTableModel tablaMultas = crearTabla();
-					String fecha = hoy.get(Calendar.YEAR)+"/"+hoy.get(Calendar.MONTH)+"/"+hoy.get(Calendar.DATE);
+					String fecha = hoy.get(Calendar.YEAR)+"/"+(hoy.get(Calendar.MONTH)+1)+"/"+hoy.get(Calendar.DATE);
 					String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
 					for(String patente:tieneMulta) {
 						st = conexionBD.createStatement();
