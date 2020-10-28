@@ -83,7 +83,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
          {
             lblNombre = new JLabel();
             pnlFiltroNombre.add(lblNombre);
-            lblNombre.setText("Búsqueda incremental del nombre");
+            lblNombre.setText("Bï¿½squeda incremental del nombre");
          }
          {
             txtNombre = new JTextField();               
@@ -179,7 +179,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
       try
       {
          // se crea una sentencia o comando jdbc para realizar la consulta 
-    	 // a partir de la conexión establecida (conexionBD)
+    	 // a partir de la conexiï¿½n establecida (conexionBD)
          Statement stmt = this.conexionBD.createStatement();
 
          // se prepara el string SQL de la consulta
@@ -222,7 +222,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
                scrTabla = new JScrollPane();
                panelTablaFiltro.add(scrTabla, BorderLayout.CENTER);
              
-               // se define el modelo de la tabla donde se almacenarán las tuplas 
+               // se define el modelo de la tabla donde se almacenarï¿½n las tuplas 
                // extendiendo DefaultTableModel 
                final class TablaEstacionadosModel extends DefaultTableModel{
                	// define la clase java asociada a cada columna de la tabla
@@ -253,12 +253,12 @@ public class VentanaInspector extends javax.swing.JInternalFrame
                TableModel EstacionadosModel = new TablaEstacionadosModel();
                                   
                /*           
-                //Otra opción: definir el modelo de la tabla usando DefalutTableModel directamente 
+                //Otra opciï¿½n: definir el modelo de la tabla usando DefalutTableModel directamente 
                  TableModel BarcosModel =   
                     new DefaultTableModel  
                     (
                        new String[][] {},
-                       new String[] {"Nombre", "Id", "Capitán"}
+                       new String[] {"Nombre", "Id", "Capitï¿½n"}
                     );
                */
                
@@ -307,8 +307,10 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			try {
 				if(conexionBD.isValid(3)) {
 					Calendar hoy = Calendar.getInstance();
+               
 					if (registrarAcceso(hoy)) {
-					
+				
+					//hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
 						st = conexionBD.createStatement();
 						ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
 						
@@ -471,7 +473,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			}
 			else {
 				JOptionPane.showMessageDialog(this,
-                        "Este inspector no está asociado a esta ubicación en este horario. Dia="+diaString+" Horario="+turno+" Calle='"+lblCalleSelec.getText().toString()+"' altura="+lblAlturaSelec.getText().toString()+"'\n",
+                        "Este inspector no estï¿½ asociado a esta ubicaciï¿½n en este horario. Dia="+diaString+" Horario="+turno+" Calle='"+lblCalleSelec.getText().toString()+"' altura="+lblAlturaSelec.getText().toString()+"'\n",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
 			}
