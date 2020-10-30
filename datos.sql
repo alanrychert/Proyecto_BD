@@ -44,9 +44,9 @@ INSERT INTO ubicaciones VALUES(500,"calle5",5.0);
 #Inserciones de asociado con (el id_asociado_con es de 1 digito)
 #---------------------id_asociado_con,legajo de inspector,calle,altura,dia,turno
 #---------------------------------------------------------------------
-INSERT INTO asociado_con VALUES(1,1,"calle1",100,"lu","m");
-INSERT INTO asociado_con VALUES(2,1,"calle2",200,"ma","m");
-INSERT INTO asociado_con VALUES(3,1,"calle3",300,"mi","t");
+INSERT INTO asociado_con VALUES(1,2,"calle1",100,"lu","m");
+INSERT INTO asociado_con VALUES(2,2,"calle2",200,"ma","m");
+INSERT INTO asociado_con VALUES(3,2,"calle3",300,"mi","t");
 INSERT INTO asociado_con VALUES(4,1,"calle4",400,"ju","t");
 INSERT INTO asociado_con VALUES(5,1,"calle5",500,"vi","t");
 #---------------------------------------------------------------------
