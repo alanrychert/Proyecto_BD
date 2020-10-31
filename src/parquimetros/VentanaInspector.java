@@ -426,8 +426,10 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			l1.addElement(patenteTextField.getText().toString());
-			patenteTextField.setText("");
+			if(patenteTextField.getText().trim()!="") {
+				l1.addElement(patenteTextField.getText().toString());
+				patenteTextField.setText("");
+			}
 		}
 		   
 	   });
