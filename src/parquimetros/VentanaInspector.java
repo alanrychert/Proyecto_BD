@@ -369,9 +369,14 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 					}
 						
 				}
-				catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				catch (SQLException ex) {
+					JOptionPane.showMessageDialog(null,
+	                        "Se produjo un error.\n" + ex.getMessage(),
+	                         "Error",
+	                         JOptionPane.ERROR_MESSAGE);
+		            System.out.println("SQLException: " + ex.getMessage());
+		            System.out.println("SQLState: " + ex.getSQLState());
+		            System.out.println("VendorError: " + ex.getErrorCode());
 				}
 	
 				//registrarAcceso();
@@ -426,7 +431,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if(patenteTextField.getText().trim()!="") {
+			if(patenteTextField.getText().length()>0) {
 				l1.addElement(patenteTextField.getText().toString());
 				patenteTextField.setText("");
 			}
@@ -509,8 +514,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
 			}
-		   }
-			
+		   }	
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
