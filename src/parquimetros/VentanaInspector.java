@@ -302,74 +302,76 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		public void actionPerformed(ActionEvent arg0) {
 			Object[] patentes= l1.toArray();
 			Statement st;
-			try {
-				if(conexionBD.isValid(3)) {
-					Calendar hoy = Calendar.getInstance();
-					String calle="",altura="";
-					//hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
-					st = conexionBD.createStatement();
-					ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
-					
-					ArrayList<String> tieneMulta = new ArrayList<String>();
-					ArrayList<String> registrado = new ArrayList<String>();
-					
-					
-					
-					while(rs.next()) {
-						registrado.add(rs.getString(1));
-					}
-					
-					for(Object p:patentes) {
-						System.out.println(p.toString());
-						if(!registrado.contains(p)) {
-							tieneMulta.add(p.toString());
-						}
-					}
-					
-					rs = st.executeQuery("SELECT calle,altura FROM parquimetros where id_parq="+lblIdParqSelec.getText()+";");
-					if(rs.next()) {
-						calle= rs.getString(1);
-						altura = rs.getString(2);
-					}
-					
-					
-					DefaultTableModel tablaMultas = crearTabla();
-					String[] f = {"multa", "fecha", "hora", "calle", "altura", "patente","legajo" };
-					tablaMultas.addRow(f);
-					String fecha = hoy.get(Calendar.YEAR)+"/"+(hoy.get(Calendar.MONTH)+1)+"/"+hoy.get(Calendar.DATE);
-					String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
-					for(String patente:tieneMulta) {
-						st = conexionBD.createStatement();
-						
-						System.out.println("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
-						st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
-						rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
-						
-						rs.next();
-						int nroMulta = rs.getInt(1);
-						String[] fila = {nroMulta+"",fecha,hora,calle,altura,patente,inspector+""};
-						tablaMultas.addRow(fila);
-					}
-					
-					JOptionPane.showMessageDialog(null,panelMultas, "Multas realizadas",JOptionPane.INFORMATION_MESSAGE);
-					
-						
-				}
-				
-				
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(lblIdParqSelec.getText()=="Id parq: ") {
+				JOptionPane.showMessageDialog(null,"Debe seleccionar un parquimetro");
 			}
-
-			//registrarAcceso();
-			
+			else{
+				try {
+					if(conexionBD.isValid(3)) {
+						Calendar hoy = Calendar.getInstance();
+						String calle="",altura="";
+						//hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
+						st = conexionBD.createStatement();
+						ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
+						
+						ArrayList<String> tieneMulta = new ArrayList<String>();
+						ArrayList<String> registrado = new ArrayList<String>();
+						
+						
+						
+						while(rs.next()) {
+							registrado.add(rs.getString(1));
+						}
+						
+						for(Object p:patentes) {
+							if(!registrado.contains(p)) {
+								tieneMulta.add(p.toString());
+							}
+						}
+						
+						rs = st.executeQuery("SELECT calle,altura FROM parquimetros where id_parq="+lblIdParqSelec.getText()+";");
+						if(rs.next()) {
+							calle= rs.getString(1);
+							altura = rs.getString(2);
+						}
+						
+						
+						DefaultTableModel tablaMultas = crearTabla();
+						String[] f = {"multa", "fecha", "hora", "calle", "altura", "patente","legajo" };
+						tablaMultas.addRow(f);
+						String fecha = hoy.get(Calendar.YEAR)+"/"+(hoy.get(Calendar.MONTH)+1)+"/"+hoy.get(Calendar.DATE);
+						String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
+						for(String patente:tieneMulta) {
+							st = conexionBD.createStatement();
+							
+							st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
+							rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
+							
+							rs.next();
+							int nroMulta = rs.getInt(1);
+							String[] fila = {nroMulta+"",fecha,hora,calle,altura,patente,inspector+""};
+							tablaMultas.addRow(fila);
+						}
+						
+						JOptionPane.showMessageDialog(null,panelMultas, "Multas realizadas",JOptionPane.INFORMATION_MESSAGE);
+							
+					}
+					
+					
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	
+				//registrarAcceso();
+				
+			}
 		}
+			   
+		   });
 		   
-	   });
-	   
-	   getContentPane().add(panelSeleccionados,BorderLayout.SOUTH);
+		   getContentPane().add(panelSeleccionados,BorderLayout.SOUTH);
 	   
 	   
    }
@@ -405,6 +407,8 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   
 	   JPanel agregarPanel = new JPanel();
 	   JButton agregarPatenteBoton = new JButton();
+	   JButton eliminarPatenteBoton = new JButton();
+	   
 	   final JTextField patenteTextField = new JTextField(20);
 	   
 	   agregarPatenteBoton.setText("Agregar");
@@ -418,9 +422,18 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		   
 	   });
 	   
+	   eliminarPatenteBoton.setText("Borrar Todo");
+	   eliminarPatenteBoton.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			l1.removeAllElements();
+		}		   
+	   });
+	   
 	   agregarPanel.setLayout(new GridLayout(1,0));
 	   agregarPanel.add(patenteTextField);
 	   agregarPanel.add(agregarPatenteBoton);
+	   agregarPanel.add(eliminarPatenteBoton);
 	   
 	   JLabel tituloLabel = new JLabel("Patentes:");
 	   tituloLabel.setFont(new Font("Arial", Font.PLAIN, 22));
