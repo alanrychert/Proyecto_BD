@@ -227,8 +227,8 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
       }
       catch (SQLException ex)
       {
-         JOptionPane.showMessageDialog(this,
-                                       "Se produjo un error.\n" + ex.getMessage(),
+         JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
+                                       ex.getMessage()+"\n",
                                        "Error",
                                        JOptionPane.ERROR_MESSAGE);
       }
