@@ -29,6 +29,7 @@ import java.awt.Dimension;
 
 import javax.swing.ButtonGroup;
 
+@SuppressWarnings("serial")
 public class PrincipalWindow {
 
 	private JFrame frame;
@@ -95,16 +96,19 @@ public class PrincipalWindow {
         
         mniLogout = new JMenuItem();
         mnuOpciones.add(mniLogout);
-        mniLogout.setText("Cerrar Sesion");
+        mniLogout.setText("Salir");
         mniLogout.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-        	//ACA SE CERRARIAN TODAS LAS VENTANAS Y SE CORTARIA LA CONEXION CON LA BD
+        		mniSalirActionPerformed(evt);
         	}
         });
-		
-	
 	}
 	
+	private void mniSalirActionPerformed(ActionEvent evt) 
+	   {
+		  frame.setVisible(false);
+	      frame.dispose();
+	   }
 	
 	
 	
