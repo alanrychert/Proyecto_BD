@@ -468,7 +468,6 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   String turno="nada";
 	   
 	   horario=hoy.get(Calendar.HOUR_OF_DAY); //Sigue dando mal
-	   System.out.print(horario);
 	   if (horario>= 8 && horario<=13)
 		   turno="m";
 	   else
