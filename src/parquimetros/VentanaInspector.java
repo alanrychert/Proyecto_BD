@@ -307,12 +307,15 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			try {
 				if(conexionBD.isValid(3)) {
 					Calendar hoy = Calendar.getInstance();
+					String calle="",altura="";
 					//hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
 					st = conexionBD.createStatement();
 					ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
 					
 					ArrayList<String> tieneMulta = new ArrayList<String>();
 					ArrayList<String> registrado = new ArrayList<String>();
+					
+					
 					
 					while(rs.next()) {
 						registrado.add(rs.getString(1));
@@ -325,7 +328,16 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 						}
 					}
 					
+					rs = st.executeQuery("SELECT calle,altura FROM parquimetros where id_parq="+lblIdParqSelec.getText()+";");
+					if(rs.next()) {
+						calle= rs.getString(1);
+						altura = rs.getString(2);
+					}
+					
+					
 					DefaultTableModel tablaMultas = crearTabla();
+					String[] f = {"multa", "fecha", "hora", "calle", "altura", "patente","legajo" };
+					tablaMultas.addRow(f);
 					String fecha = hoy.get(Calendar.YEAR)+"/"+(hoy.get(Calendar.MONTH)+1)+"/"+hoy.get(Calendar.DATE);
 					String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
 					for(String patente:tieneMulta) {
@@ -337,7 +349,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 						
 						rs.next();
 						int nroMulta = rs.getInt(1);
-						String[] fila = {nroMulta+"",fecha,hora,"calle aux","altura aux",patente,inspector+""};
+						String[] fila = {nroMulta+"",fecha,hora,calle,altura,patente,inspector+""};
 						tablaMultas.addRow(fila);
 					}
 					
