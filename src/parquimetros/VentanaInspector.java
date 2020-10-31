@@ -302,13 +302,15 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		public void actionPerformed(ActionEvent arg0) {
 			Object[] patentes= l1.toArray();
 			Statement st;
-			try {
-				if(conexionBD.isValid(3)) {
-					Calendar hoy = Calendar.getInstance();
-					String calle="",altura="";
-					
-					if (registrarAcceso(hoy)) {
-						hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
+			if(lblIdParqSelec.getText()=="Id parq: ") {
+				JOptionPane.showMessageDialog(null,"Debe seleccionar un parquimetro");
+			}
+			else{
+				try {
+					if(conexionBD.isValid(3)) {
+						Calendar hoy = Calendar.getInstance();
+						String calle="",altura="";
+						//hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
 						st = conexionBD.createStatement();
 						ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
 						
@@ -322,7 +324,6 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 						}
 						
 						for(Object p:patentes) {
-							System.out.println(p.toString());
 							if(!registrado.contains(p)) {
 								tieneMulta.add(p.toString());
 							}
@@ -343,7 +344,6 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 						for(String patente:tieneMulta) {
 							st = conexionBD.createStatement();
 							
-							System.out.println("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
 							st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
 							rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
 							
@@ -364,21 +364,15 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 					}
 						
 				}
+	
+				//registrarAcceso();
 				
-				
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-
-			//registrarAcceso();
-			
 		}
+			   
+		   });
 		   
-	   });
-	   
-	   getContentPane().add(panelSeleccionados,BorderLayout.SOUTH);
+		   getContentPane().add(panelSeleccionados,BorderLayout.SOUTH);
 	   
 	   
    }
@@ -414,6 +408,8 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   
 	   JPanel agregarPanel = new JPanel();
 	   JButton agregarPatenteBoton = new JButton();
+	   JButton eliminarPatenteBoton = new JButton();
+	   
 	   final JTextField patenteTextField = new JTextField(20);
 	   
 	   agregarPatenteBoton.setText("Agregar");
@@ -427,9 +423,18 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		   
 	   });
 	   
+	   eliminarPatenteBoton.setText("Borrar Todo");
+	   eliminarPatenteBoton.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			l1.removeAllElements();
+		}		   
+	   });
+	   
 	   agregarPanel.setLayout(new GridLayout(1,0));
 	   agregarPanel.add(patenteTextField);
 	   agregarPanel.add(agregarPatenteBoton);
+	   agregarPanel.add(eliminarPatenteBoton);
 	   
 	   JLabel tituloLabel = new JLabel("Patentes:");
 	   tituloLabel.setFont(new Font("Arial", Font.PLAIN, 22));
