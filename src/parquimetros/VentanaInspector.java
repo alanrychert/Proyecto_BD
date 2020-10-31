@@ -309,52 +309,54 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 				try {
 					if(conexionBD.isValid(3)) {
 						Calendar hoy = Calendar.getInstance();
-						String calle="",altura="";
-						//hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
-						st = conexionBD.createStatement();
-						ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
-						
-						ArrayList<String> tieneMulta = new ArrayList<String>();
-						ArrayList<String> registrado = new ArrayList<String>();
-						
-						
-						
-						while(rs.next()) {
-							registrado.add(rs.getString(1));
-						}
-						
-						for(Object p:patentes) {
-							if(!registrado.contains(p)) {
-								tieneMulta.add(p.toString());
+						hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
+							if (registrarAcceso(hoy)) {
+								String calle="",altura="";
+								st = conexionBD.createStatement();
+								ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
+								
+								ArrayList<String> tieneMulta = new ArrayList<String>();
+								ArrayList<String> registrado = new ArrayList<String>();
+								
+								
+								
+								while(rs.next()) {
+									registrado.add(rs.getString(1));
+								}
+								
+								for(Object p:patentes) {
+									if(!registrado.contains(p)) {
+										tieneMulta.add(p.toString());
+									}
+								}
+								
+								rs = st.executeQuery("SELECT calle,altura FROM parquimetros where id_parq="+lblIdParqSelec.getText()+";");
+								if(rs.next()) {
+									calle= rs.getString(1);
+									altura = rs.getString(2);
+								}
+								
+								
+								DefaultTableModel tablaMultas = crearTabla();
+								String[] f = {"multa", "fecha", "hora", "calle", "altura", "patente","legajo" };
+								tablaMultas.addRow(f);
+								String fecha = hoy.get(Calendar.YEAR)+"/"+(hoy.get(Calendar.MONTH)+1)+"/"+hoy.get(Calendar.DATE);
+								String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
+								for(String patente:tieneMulta) {
+									st = conexionBD.createStatement();
+									
+									st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
+									rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
+									
+									rs.next();
+									int nroMulta = rs.getInt(1);
+									String[] fila = {nroMulta+"",fecha,hora,calle,altura,patente,inspector+""};
+									tablaMultas.addRow(fila);
+								}
+								
+								JOptionPane.showMessageDialog(null,panelMultas, "Multas realizadas",JOptionPane.INFORMATION_MESSAGE);
+								
 							}
-						}
-						
-						rs = st.executeQuery("SELECT calle,altura FROM parquimetros where id_parq="+lblIdParqSelec.getText()+";");
-						if(rs.next()) {
-							calle= rs.getString(1);
-							altura = rs.getString(2);
-						}
-						
-						
-						DefaultTableModel tablaMultas = crearTabla();
-						String[] f = {"multa", "fecha", "hora", "calle", "altura", "patente","legajo" };
-						tablaMultas.addRow(f);
-						String fecha = hoy.get(Calendar.YEAR)+"/"+(hoy.get(Calendar.MONTH)+1)+"/"+hoy.get(Calendar.DATE);
-						String hora = hoy.get(Calendar.HOUR_OF_DAY)+":"+hoy.get(Calendar.MINUTE)+":"+hoy.get(Calendar.SECOND);
-						for(String patente:tieneMulta) {
-							st = conexionBD.createStatement();
-							
-							st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
-							rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
-							
-							rs.next();
-							int nroMulta = rs.getInt(1);
-							String[] fila = {nroMulta+"",fecha,hora,calle,altura,patente,inspector+""};
-							tablaMultas.addRow(fila);
-						}
-						
-						JOptionPane.showMessageDialog(null,panelMultas, "Multas realizadas",JOptionPane.INFORMATION_MESSAGE);
-						
 					}
 					else {
 						JOptionPane.showMessageDialog(null,
@@ -363,6 +365,10 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 		                        JOptionPane.ERROR_MESSAGE);
 					}
 						
+				}
+				catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 	
 				//registrarAcceso();
@@ -485,13 +491,19 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   Statement st;
 	   try {
 		   if (conexionBD.isValid(3)) {
-				st = conexionBD.createStatement();
-				
-				ResultSet rs=st.executeQuery("Select * from asociado_con where dia='"+diaString+"' and turno='"+turno+"' and legajo="+inspector+" and calle='"+lblCalleSelec.getText().toString()+"' and altura="+Integer.parseInt(lblAlturaSelec.getText().toString()));
-				if (rs.next()) {
-					st.execute("INSERT INTO accede VALUES("+inspector+","+idParq+",\""+fecha+"\",\""+hora+"\");");
-					registrado=true;
-				}
+			st = conexionBD.createStatement();
+			
+			ResultSet rs=st.executeQuery("Select * from asociado_con where dia='"+diaString+"' and turno='"+turno+"' and legajo="+inspector+" and calle='"+lblCalleSelec.getText().toString()+"' and altura="+Integer.parseInt(lblAlturaSelec.getText().toString()));
+			if (rs.next()) {
+				st.execute("INSERT INTO accede VALUES("+inspector+","+idParq+",\""+fecha+"\",\""+hora+"\");");
+				registrado=true;
+			}
+			else {
+				JOptionPane.showMessageDialog(this,
+                        "Este inspector no esta asociado a esta ubicacion en este horario.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+			}
 		   }
 			
 		} catch (SQLException e) {
