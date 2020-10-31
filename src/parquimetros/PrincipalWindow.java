@@ -1,6 +1,6 @@
 package parquimetros;
 
-import java.awt.EventQueue;
+import java.awt.EventQueue; 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,7 +10,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Hashtable;
 
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -29,7 +28,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 
 public class PrincipalWindow {
 
@@ -106,6 +104,8 @@ public class PrincipalWindow {
 		
 	
 	}
+	
+	
 	
 	
 	private void cargarVentanaPrincipal(JInternalFrame ventana){
@@ -206,7 +206,14 @@ public class PrincipalWindow {
 							int legajo = Integer.parseInt(username.getText());
 							cargarVentanaPrincipal(new VentanaInspector(conexionBD,legajo));
 				   			JOptionPane.showMessageDialog(frame, "se ingreso correctamente");					
-						}	
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(frame,
+			                       "Usuario o contraseña incorrecto",
+					                        "Error",
+					                        JOptionPane.ERROR_MESSAGE);
+						}
 					}				
 				} catch (SQLException ex) {
 					JOptionPane.showMessageDialog(frame,
@@ -217,6 +224,7 @@ public class PrincipalWindow {
 				}
 	    		
 	   		}
+	    	conexionBD=null; //pongo la conexión en nulo porque no la va a usar hasta que intente iniciar denuevo, donde crea una nueva.
 	   	}
   
 	    
@@ -249,22 +257,6 @@ public class PrincipalWindow {
 	      }
 	   }
 
-	   private void desconectarBD()
-	   {
-	      if (this.conexionBD != null)
-	      {
-	         try
-	         {
-	            this.conexionBD.close();
-	            this.conexionBD = null;
-	         }
-	         catch (SQLException ex)
-	         {
-	            System.out.println("SQLException: " + ex.getMessage());
-	            System.out.println("SQLState: " + ex.getSQLState());
-	            System.out.println("VendorError: " + ex.getErrorCode());
-	         }
-	      }
-	   }
+	  
 	   
 }

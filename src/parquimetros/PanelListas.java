@@ -89,7 +89,6 @@ public class PanelListas extends JPanel {
 		add(labelAtributos);
 		labelAtributos.setHorizontalAlignment((int) CENTER_ALIGNMENT);
 		
-		//String array to store weekdays 
         String atributos[]= {}; 
         
         jspListaAtributos= new JScrollPane();
@@ -111,6 +110,8 @@ public class PanelListas extends JPanel {
 		   while (rs.next()) {
 			   listaA.add(rs.getString(1));
 		   }
+		   st.close();
+		   rs.close();
 		   listaAtributos.setListData(listaA.toArray());
 		   }
 	   }catch(SQLException ex)
@@ -121,4 +122,27 @@ public class PanelListas extends JPanel {
 	        }
 	   
    }
+	
+	public void refrescarListaTablas() {
+		ArrayList <String> listaT= new ArrayList<String>();
+		
+		try {
+			if(conexionBD.isValid(5)) {
+				Statement st= conexionBD.createStatement();
+				ResultSet rs = st.executeQuery("show tables");
+				
+				while (rs.next()) {
+					listaT.add( rs.getString(1));
+				}
+				st.close();
+				rs.close();
+				listaTablas.setListData(listaT.toArray());
+			}
+		}catch (SQLException ex)
+	      {
+	         System.out.println("SQLException: " + ex.getMessage());
+	         System.out.println("SQLState: " + ex.getSQLState());
+	         System.out.println("VendorError: " + ex.getErrorCode());
+	      }
+	}
 }

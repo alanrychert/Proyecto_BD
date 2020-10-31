@@ -89,11 +89,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
                   txtInput.setTabSize(3);
                   txtInput.setColumns(80);
                   txtInput.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
-                  txtInput.setText("SELECT t.fecha, t.nombre_batalla, b.nombre_barco, b.id, b.capitan, r.resultado \n" +
-                                      "FROM batallas t, resultados r, barcos b \n" +
-                                      "WHERE t.nombre_batalla = r.nombre_batalla \n" +
-                                      "AND r.nombre_barco = b.nombre_barco \n" +
-                                      "ORDER BY t.fecha, t.nombre_batalla, b.nombre_barco");
+                  txtInput.setText("Cualquier consulta");
                   txtInput.setFont(new java.awt.Font("Monospaced",0,12));
                   txtInput.setRows(10);
                }
@@ -146,6 +142,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
    {
 	   try
        {
+		  desconectarBD();
           tabla.close();            
        }
        catch (SQLException ex)
@@ -224,6 +221,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
          String sql = txtInput.getText().trim();
          stmt.execute(sql);
          stmt.close();
+         panelListas.refrescarListaTablas();
       }
       catch (SQLException ex)
       {

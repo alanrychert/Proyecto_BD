@@ -113,14 +113,12 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 
    private void thisComponentShown(ComponentEvent evt) 
    {
-      //this.conectarBD();
-	  //PREGUNTAR SI ES NECESARIO QUE SE CONECTE Y DESCONECTE CUANDO SE MUESTRA Y SE OCULTA
       this.refrescarTabla();
    }
    
    private void thisComponentHidden(ComponentEvent evt) 
    {
-      //this.desconectarBD();
+      this.desconectarBD();
    }
 
    private void txtNombreCaretUpdate(CaretEvent evt) 
@@ -156,7 +154,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
       //this.txtFecha.setText(Fechas.convertirDateAString((java.util.Date) this.tabla.getValueAt(this.tabla.getSelectedRow(), 1)));
    }
 
-   /*private void desconectarBD()
+   private void desconectarBD()
    {
       if (this.conexionBD != null)
       {
@@ -172,7 +170,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
             System.out.println("VendorError: " + ex.getErrorCode());
          }
       }
-   }*/
+   }
 
    private void refrescarTabla()
    {
@@ -474,7 +472,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			}
 			else {
 				JOptionPane.showMessageDialog(this,
-                        "Este inspector no esta asociado a esta ubicacion en este horario. Dia="+diaString+" Horario="+turno+" Calle='"+lblCalleSelec.getText().toString()+"' altura="+lblAlturaSelec.getText().toString()+"'\n",
+                        "Este inspector no esta asociado a esta ubicacion en este horario.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
 			}
