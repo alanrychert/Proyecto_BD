@@ -224,7 +224,8 @@ public class VentanaInspector extends javax.swing.JInternalFrame
                // extendiendo DefaultTableModel 
                final class TablaEstacionadosModel extends DefaultTableModel{
                	// define la clase java asociada a cada columna de la tabla
-          	        private Class[] types;
+          	        @SuppressWarnings("rawtypes")
+					private Class[] types;
             	    // define si una columna es editable
                    private boolean[] canEdit;
                    
@@ -237,7 +238,8 @@ public class VentanaInspector extends javax.swing.JInternalFrame
                    };             	
                		             
                    // recupera la clase java de cada columna de la tabla
-                   public Class getColumnClass(int columnIndex) 
+                   @SuppressWarnings({ "unchecked", "rawtypes" })
+				public Class getColumnClass(int columnIndex) 
                    {
                       return types[columnIndex];
                    }
@@ -298,6 +300,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   
 	   btnVerificar.addActionListener(new ActionListener() {
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			Object[] patentes= l1.toArray();

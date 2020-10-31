@@ -29,7 +29,6 @@ import java.awt.Dimension;
 
 import javax.swing.ButtonGroup;
 
-@SuppressWarnings("serial")
 public class PrincipalWindow {
 
 	private JFrame frame;

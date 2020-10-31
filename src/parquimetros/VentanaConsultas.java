@@ -8,14 +8,11 @@ import java.awt.event.ComponentEvent;
 
 import java.sql.Types;
 import java.sql.Connection;
-import java.sql.DriverManager;
-//import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,8 +21,6 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import quick.dbtable.*; 
 
 
