@@ -149,7 +149,6 @@ public class PrincipalWindow {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				username.setText("");
-				username.setEditable(true);
 				usuarioLabel.setText("Legajo");
 			}
 	    	
@@ -158,7 +157,6 @@ public class PrincipalWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				username.setText("admin");
-				username.setEditable(false);
 				usuarioLabel.setText("");
 			}	
 	    	
