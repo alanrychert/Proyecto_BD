@@ -429,7 +429,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   
 	   MaskFormatter formato = null;
 		try {
-			formato = new MaskFormatter("LLLAAA");
+			formato = new MaskFormatter("UUU###");
 		} catch (ParseException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
