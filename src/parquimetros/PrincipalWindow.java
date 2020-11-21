@@ -214,14 +214,15 @@ public class PrincipalWindow {
 			                       "Usuario o contraseña incorrecto",
 					                        "Error",
 					                        JOptionPane.ERROR_MESSAGE);
+							mostrarPanelLogin(frame);
 						}
 					}				
 				} catch (SQLException ex) {
 					JOptionPane.showMessageDialog(frame,
-		                       "Usuario o contraseña incorrecto" + 
-		                        ex.getMessage(),
+		                       "Usuario o contraseña incorrecto",
 		                        "Error",
 		                        JOptionPane.ERROR_MESSAGE);
+								mostrarPanelLogin(frame);
 				}
 	    		
 	   		}
