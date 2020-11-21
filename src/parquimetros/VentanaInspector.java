@@ -316,7 +316,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 							if (registrarAcceso(hoy)) {
 								String calle="",altura="";
 								st = conexionBD.createStatement();
-								ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where id_parq="+lblIdParqSelec.getText()+";");
+								ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where calle="+lblCalleSelec.getText()+" and altura="+lblAlturaSelec.getText()+";");
 								
 								ArrayList<String> tieneMulta = new ArrayList<String>();
 								ArrayList<String> registrado = new ArrayList<String>();
