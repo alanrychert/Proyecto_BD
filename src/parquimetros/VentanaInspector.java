@@ -16,12 +16,14 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -34,6 +36,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.text.MaskFormatter;
 
 
 @SuppressWarnings("serial")
@@ -424,8 +427,14 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   JButton agregarPatenteBoton = new JButton();
 	   JButton eliminarPatenteBoton = new JButton();
 	   
-	   final JTextField patenteTextField = new JTextField(20);
-	   
+	   MaskFormatter formato = null;
+		try {
+			formato = new MaskFormatter("LLLAAA");
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	   final JFormattedTextField patenteTextField = new JFormattedTextField(formato);
 	   agregarPatenteBoton.setText("Agregar");
 	   agregarPatenteBoton.addActionListener(new ActionListener() {
 
