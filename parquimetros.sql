@@ -201,8 +201,8 @@ CREATE TABLE Estacionamientos (
 delimiter !
 create procedure conectar(IN tarjeta INTEGER, IN parquimetro INTEGER)
 begin  
-    declare nuevo_saldo int;
-    declare saldo_actual int;
+    declare nuevo_saldo decimal(3,2);
+    declare saldo_actual decimal(3,2);
     declare fecha_act DATE;
     declare hora_act TIME;
     declare fecha_entrada DATE;
@@ -225,7 +225,6 @@ begin
     SELECT saldo into saldo_actual from tarjetas where id_tarjeta=tarjeta; 
     SELECT tarifa into costo_minuto from parquimetros natural join ubicaciones where id_parq = parquimetro;
     SELECT descuento into descontar from tarjetas natural join tipos_tarjeta where id_tarjeta=tarjeta;
-    SELECT saldo into saldo_actual from tarjetas where id_tarjeta=tarjeta; 
          
     
     if estacionamientoAbierto then 
@@ -249,10 +248,10 @@ begin
         
         if saldo_actual <0 
             then 
-                select "apertura" as operacion, "no_exitosa" as resultado, saldo/(costo_minuto*(1-descontar)) as tiempo_disponible;
+                select "apertura" as operacion, "no_exitosa" as resultado, saldo_actual/(costo_minuto*(1-descontar)) as tiempo_disponible;
             else
                 INSERT INTO Estacionamientos VALUES(tarjeta,parquimetro,CURRENT_DATE(),CURRENT_TIME(),null,null);
-                select "apertura" as operacion, "exitosa" as resultado, saldo/(costo_minuto*(1-descontar)) as tiempo_disponible;
+                select "apertura" as operacion, "exitosa" as resultado, saldo_actual/(costo_minuto*(1-descontar)) as tiempo_disponible;
                 
         end if;
     end if;
@@ -294,9 +293,9 @@ CREATE USER 'inspector'@'%' IDENTIFIED BY 'inspector';
 # abierto en la ubicación del parqu´ımetro,
 # cargar multas, y
 # registrar accesos a parquímetros.
-CREATE USER 'parquimetro'@'%' IDENTIFIED BY 'parqui'; 
+CREATE USER 'parquimetro'@'%' IDENTIFIED BY 'parquimetro'; 
 
-GRANT execute on procedure parquimetros.conectar TO 'parquimetro'@'%';
+GRANT execute on procedure parquimetros.conectar TO 'parquitro'@'%';
 
 GRANT SELECT ON parquimetros.Parquimetros TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Multa TO 'inspector'@'%';
