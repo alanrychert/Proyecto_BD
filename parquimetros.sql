@@ -201,8 +201,8 @@ CREATE TABLE Estacionamientos (
 delimiter !
 create procedure conectar(IN tarjeta INTEGER, IN parquimetro INTEGER)
 begin  
-    declare nuevo_saldo decimal(3,2);
-    declare saldo_actual decimal(3,2);
+    declare nuevo_saldo decimal(5,2);
+    declare saldo_actual decimal(5,2);
     declare fecha_act DATE;
     declare hora_act TIME;
     declare fecha_entrada DATE;
@@ -227,7 +227,7 @@ begin
     SELECT descuento into descontar from tarjetas natural join tipos_tarjeta where id_tarjeta=tarjeta;
          
     
-    if estacionamientoAbierto then 
+    if not(estacionamientoAbierto) then 
          SELECT CURRENT_DATE() INTO fecha_act;
          SELECT CURRENT_TIME() INTO hora_act;
 
@@ -238,11 +238,11 @@ begin
          
          SELECT TIMEDIFF( TIMESTAMP (fecha_act, hora_act), TIMESTAMP (fecha_entrada, hora_entrada)) into diferencia_tiempo;
 
-         select (saldo_actual-(time_to_sec(diferencia_tiempo)/60 * costo_minuto * (1 - descontar))) into nuevo_saldo;
+         select greatest(-999.99,(saldo_actual-((time_to_sec(diferencia_tiempo)/60) * costo_minuto * (1 - descontar)))) into nuevo_saldo;
          
-         update tarjetas set saldo = nuevo_saldo where id_tarjeta = tarjeta;
+         update tarjetas set saldo = nuevo_saldo where id_tarjeta = tarjeta; 
          
-        select "cierre" as operacion, time_to_sec(diferencia_tiempo)/60 as tiempo_transcurrido, nuevo_saldo as saldo_actualizado;
+        select "cierre" as operacion, time_to_sec(diferencia_tiempo)/60 as tiempo_transcurrido, greatest(-999.99,nuevo_saldo) as saldo_actualizado;
         
     else
         
@@ -295,7 +295,7 @@ CREATE USER 'inspector'@'%' IDENTIFIED BY 'inspector';
 # registrar accesos a parquímetros.
 CREATE USER 'parquimetro'@'%' IDENTIFIED BY 'parquimetro'; 
 
-GRANT execute on procedure parquimetros.conectar TO 'parquitro'@'%';
+GRANT execute on procedure parquimetros.conectar TO 'parquimetro'@'%';
 
 GRANT SELECT ON parquimetros.Parquimetros TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Multa TO 'inspector'@'%';
