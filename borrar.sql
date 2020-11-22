@@ -6,7 +6,7 @@ drop user inspector@'%';
 
 drop user venta@'%';
 
-drop user parqui@'%';
+drop user parquimetro@'%';
 
 flush privileges;
 

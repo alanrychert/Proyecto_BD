@@ -294,9 +294,9 @@ CREATE USER 'inspector'@'%' IDENTIFIED BY 'inspector';
 # abierto en la ubicación del parqu´ımetro,
 # cargar multas, y
 # registrar accesos a parquímetros.
-CREATE USER 'parqui'@'%' IDENTIFIED BY 'parqui'; 
+CREATE USER 'parquimetro'@'%' IDENTIFIED BY 'parqui'; 
 
-GRANT execute on procedure parquimetros.conectar TO 'parqui'@'%';
+GRANT execute on procedure parquimetros.conectar TO 'parquimetro'@'%';
 
 GRANT SELECT ON parquimetros.Parquimetros TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Multa TO 'inspector'@'%';
