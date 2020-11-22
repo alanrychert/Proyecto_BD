@@ -198,6 +198,69 @@ CREATE TABLE Estacionamientos (
  WHERE estacionamientos.fecha_sal is NULL and estacionamientos.hora_sal is NULL;
 
 #-------------------------------------------------------------------------
+delimiter !
+create procedure conectar(IN tarjeta INTEGER, IN parquimetro INTEGER)
+begin  
+    declare nuevo_saldo int;
+    declare saldo_actual int;
+    declare fecha_act DATE;
+    declare hora_act TIME;
+    declare fecha_entrada DATE;
+    declare hora_entrada TIME;
+    declare diferencia_tiempo TIME;
+    declare costo_minuto int;
+    declare descontar DECIMAL(3,2);   
+
+    
+    declare estacionamientoAbierto boolean default false;
+
+    declare C cursor for select * from estacionamientos where id_tarjeta = tarjeta and id_parq = parquimetro and (fecha_sal is NULL) and (hora_sal is NULL);
+    
+    declare continue handler for not found set estacionamientoAbierto = true;
+    
+    start transaction;
+
+
+
+    SELECT saldo into saldo_actual from tarjetas where id_tarjeta=tarjeta; 
+    SELECT tarifa into costo_minuto from parquimetros natural join ubicaciones where id_parq = parquimetro;
+    SELECT descuento into descontar from tarjetas natural join tipos_tarjeta where id_tarjeta=tarjeta;
+    SELECT saldo into saldo_actual from tarjetas where id_tarjeta=tarjeta; 
+         
+    
+    if estacionamientoAbierto then 
+         SELECT CURRENT_DATE() INTO fecha_act;
+         SELECT CURRENT_TIME() INTO hora_act;
+
+         update estacionamientos set fecha_sal = fecha_act,hora_sal = hora_act where id_tarjeta = tarjeta and id_parq=parquimetro and fecha_sal is NULL and hora_sal is NULL;
+         
+         SELECT fecha_ent into fecha_entrada from estacionamientos where id_tarjeta = tarjeta and id_parq = parquimetro and fecha_sal = fecha_act and hora_sal = hora_act;
+         SELECT hora_ent into hora_entrada from estacionamientos where id_tarjeta = tarjeta and id_parq = parquimetro and fecha_sal = fecha_act and hora_sal = hora_act;
+         
+         SELECT TIMEDIFF( TIMESTAMP (fecha_act, hora_act), TIMESTAMP (fecha_entrada, hora_entrada)) into diferencia_tiempo;
+
+         select (saldo_actual-(time_to_sec(diferencia_tiempo)/60 * costo_minuto * (1 - descontar))) into nuevo_saldo;
+         
+         update tarjetas set saldo = nuevo_saldo where id_tarjeta = tarjeta;
+         
+        select "cierre" as operacion, time_to_sec(diferencia_tiempo)/60 as tiempo_transcurrido, nuevo_saldo as saldo_actualizado;
+        
+    else
+        
+        if saldo_actual <0 
+            then 
+                select "apertura" as operacion, "no_exitosa" as resultado, saldo/(costo_minuto*(1-descontar)) as tiempo_disponible;
+            else
+                INSERT INTO Estacionamientos VALUES(tarjeta,parquimetro,CURRENT_DATE(),CURRENT_TIME(),null,null);
+                select "apertura" as operacion, "exitosa" as resultado, saldo/(costo_minuto*(1-descontar)) as tiempo_disponible;
+                
+        end if;
+    end if;
+    
+    end; !
+delimiter ;
+
+ 
 
 
 #-------------------------------------------------------------------------
@@ -206,7 +269,7 @@ CREATE TABLE Estacionamientos (
 # Creo el usuario admin con contraseña "admin" que únicamente se puede conectar desde la computadora donde
 # se encuentra el servidor de MySQL
  
- CREATE USER 'admin'@'localhost'  IDENTIFIED BY 'admin'; 
+ CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin'; 
 
 # luego le otorgo todos los privilegios sobre la base de datos y también el privilegio de 
 # otorgar privilegios a otro usuario de la misma
@@ -231,6 +294,9 @@ CREATE USER 'inspector'@'%' IDENTIFIED BY 'inspector';
 # abierto en la ubicación del parqu´ımetro,
 # cargar multas, y
 # registrar accesos a parquímetros.
+CREATE USER 'parqui'@'%' IDENTIFIED BY 'parqui'; 
+
+GRANT execute on procedure parquimetros.conectar TO 'parqui'@'%';
 
 GRANT SELECT ON parquimetros.Parquimetros TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Multa TO 'inspector'@'%';
