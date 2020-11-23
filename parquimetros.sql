@@ -188,6 +188,37 @@ CREATE TABLE Estacionamientos (
    ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+
+CREATE TABLE Ventas(
+  id_tarjeta INT UNSIGNED NOT NULL,
+  tipo_tarjeta VARCHAR(45) NOT NULL,
+  saldo DECIMAL(5,2) NOT NULL,
+  fecha DATE NOT NULL,
+  hora TIME NOT NULL,
+
+  CONSTRAINT pk_tarjeta
+    PRIMARY KEY (id_tarjeta,fecha,hora),
+
+  CONSTRAINT FK_tipo_tarjeta
+  FOREIGN KEY (tipo_tarjeta) REFERENCES Tipos_tarjeta(tipo)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+
+  CONSTRAINT FK_tarjeta_ventas
+  FOREIGN KEY (id_tarjeta) REFERENCES Tarjetas(id_tarjeta)
+      ON DELETE RESTRICT ON UPDATE CASCADE
+
+)ENGINE=InnoDB;
+
+delimiter !
+CREATE TRIGGER ventas_update
+AFTER INSERT ON tarjetas #si salta un error es aca 
+FOR EACH ROW
+BEGIN
+INSERT INTO Ventas VALUES(NEW.id_tarjeta, NEW.tipo, NEW.saldo, current_date(),current_time());
+END; !
+delimiter ;
+
+
 #-------------------------------------------------------------------------
 # Creacion de vistas 
 # estacionados = Permite ver la calle, altura y las patentes de los autos que tienen un estacionamiento "abierto" en cada ubicación
@@ -304,3 +335,5 @@ GRANT SELECT ON parquimetros.Estacionados TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Asociado_con TO 'inspector'@'%';
 GRANT INSERT ON parquimetros.Multa TO 'inspector'@'%';
 GRANT INSERT ON parquimetros.Accede TO 'inspector'@'%';
+
+

@@ -8,5 +8,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/Alan/Desktop/ejemplo java-MySQL/mysql-connector-java-8.0.21.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Alan/Desktop/ejemplo java-MySQL/quicktable-3.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/mati/Desktop/ejemplo java-MySQL/mysql-connector-java-8.0.21.jar"/>
+	<classpathentry kind="lib" path="C:/Users/mati/Desktop/ejemplo java-MySQL/quicktable-3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
