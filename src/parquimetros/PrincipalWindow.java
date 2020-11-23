@@ -40,6 +40,7 @@ public class PrincipalWindow {
 	private JMenu mnuOpciones;
 	private JMenuItem mniLogin;
 	private JMenuItem mniLogout;
+	private JMenuItem mniTarjeta;
 	
 	/**
 	 * Launch the application.
@@ -101,6 +102,18 @@ public class PrincipalWindow {
         		mniSalirActionPerformed(evt);
         	}
         });
+        
+        mniTarjeta = new JMenuItem();
+        mnuOpciones.add(mniTarjeta);
+        mniTarjeta.setText("conectar tarjeta");
+        mniTarjeta.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+            		conectarBD("parquimetro","parqui");
+            		cargarVentanaPrincipal(new VentanaConexionTarjeta(conexionBD));
+            	}
+            });
+		
+        
 	}
 	
 	private void mniSalirActionPerformed(ActionEvent evt) 
@@ -108,6 +121,7 @@ public class PrincipalWindow {
 		  frame.setVisible(false);
 	      frame.dispose();
 	   }
+	
 	
 	
 	
