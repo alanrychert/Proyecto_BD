@@ -209,12 +209,14 @@ CREATE TABLE Ventas(
 
 )ENGINE=InnoDB;
 
+
+
 delimiter !
 CREATE TRIGGER ventas_update
 AFTER INSERT ON tarjetas #si salta un error es aca 
 FOR EACH ROW
 BEGIN
-INSERT INTO Ventas VALUES(NEW.id_tarjeta, NEW.tipo, NEW.saldo, current_date(),current_time());
+  INSERT INTO Ventas VALUES(NEW.id_tarjeta, NEW.tipo, NEW.saldo, current_date(),current_time());
 END; !
 delimiter ;
 
@@ -242,50 +244,57 @@ begin
     declare costo_minuto int;
     declare descontar DECIMAL(3,2);   
 
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+      BEGIN 
+        SELECT 'Error: transacción revertida.' AS operacion;
+        ROLLBACK;
+      END;
+
+
+    START TRANSACTION;
+
+    #Primero se verifica si el id de la tarjeta y el parquimetro son validos     
+    if not(exists(SELECT * FROM Parquimetros WHERE id_parq = parquimetro) AND exists(SELECT * FROM tarjetas WHERE id_tarjeta = tarjeta)) THEN
+        #Si no existen entonces se debe finalizar el procedimiento indicando el error
+        SELECT "Error: El ID del parquimetro o el numero de tarjeta no son validos" AS operacion;
+    ELSE
+      #si los datos ingresados son validos entonces se obtienen los datos necesarios para ejecutar un cierre o apertura de un estacionamiento
+      SELECT saldo into saldo_actual FROM tarjetas WHERE id_tarjeta=tarjeta; 
+      SELECT tarifa into costo_minuto FROM parquimetros NATURAL JOIN ubicaciones WHERE id_parq = parquimetro;
+      SELECT descuento into descontar FROM tarjetas NATURAL JOIN tipos_tarjeta WHERE id_tarjeta = tarjeta;
+
+      #Se verifica si la tarjeta tiene un estacionamiento abierto
+      if exists(SELECT * FROM estacionamientos WHERE id_tarjeta = tarjeta AND id_parq = parquimetro AND (fecha_sal is NULL) AND (hora_sal is NULL)) THEN 
+          set fecha_act=CURRENT_DATE();
+          set hora_act= CURRENT_TIME();
+
+          #fecha y hora de apertura del estacionamiento
+          SELECT fecha_ent into fecha_entrada FROM estacionamientos WHERE id_tarjeta = tarjeta AND id_parq = parquimetro AND fecha_sal IS NULL AND hora_sal IS NULL;
+          SELECT hora_ent into hora_entrada FROM estacionamientos WHERE id_tarjeta = tarjeta AND id_parq = parquimetro AND fecha_sal IS NULL AND hora_sal IS NULL;
+
+          #Se cierra el estacionamiento con la fecha y hora actual
+          UPDATE estacionamientos SET fecha_sal = fecha_act,hora_sal = hora_act WHERE id_tarjeta = tarjeta AND id_parq=parquimetro AND fecha_sal is NULL AND hora_sal is NULL;
+           
+          SET diferencia_tiempo=TIMEDIFF( TIMESTAMP (fecha_act, hora_act), TIMESTAMP (fecha_entrada, hora_entrada));
+
+          SET nuevo_saldo= greatest(-999.99,(saldo_actual-((time_to_sec(diferencia_tiempo)/60) * costo_minuto * (1 - descontar)))) ;
+           
+          UPDATE tarjetas SET saldo = nuevo_saldo WHERE id_tarjeta = tarjeta; 
+           
+          SELECT "cierre" AS operacion, time_to_sec(diferencia_tiempo)/60 AS tiempo_transcurrido, greatest(-999.99,nuevo_saldo) AS saldo_actualizado;
+          
+      ELSE
+          #Si no habia un estacinamiento entonces se deberia abrir uno si el saldo es suficiente
+          IF (saldo_actual <0) THEN 
+              select "apertura" as operacion, "no_exitosa" as resultado, saldo_actual/(costo_minuto*(1-descontar)) as tiempo_disponible;
+          ELSE
+              INSERT INTO Estacionamientos VALUES(tarjeta,parquimetro,CURRENT_DATE(),CURRENT_TIME(),NULL,NULL);
+              SELECT "apertura" AS operacion, "exitosa" AS resultado, saldo_actual/(costo_minuto*(1-descontar)) AS tiempo_disponible;
+          END IF;
+      END IF;
+    END IF;
     
-    declare estacionamientoAbierto boolean default false;
-
-    declare C cursor for select * from estacionamientos where id_tarjeta = tarjeta and id_parq = parquimetro and (fecha_sal is NULL) and (hora_sal is NULL);
-    
-    declare continue handler for not found set estacionamientoAbierto = true;
-    
-    start transaction;
-
-
-
-    SELECT saldo into saldo_actual from tarjetas where id_tarjeta=tarjeta; 
-    SELECT tarifa into costo_minuto from parquimetros natural join ubicaciones where id_parq = parquimetro;
-    SELECT descuento into descontar from tarjetas natural join tipos_tarjeta where id_tarjeta=tarjeta;
-         
-    
-    if not(estacionamientoAbierto) then 
-         SELECT CURRENT_DATE() INTO fecha_act;
-         SELECT CURRENT_TIME() INTO hora_act;
-
-         update estacionamientos set fecha_sal = fecha_act,hora_sal = hora_act where id_tarjeta = tarjeta and id_parq=parquimetro and fecha_sal is NULL and hora_sal is NULL;
-         
-         SELECT fecha_ent into fecha_entrada from estacionamientos where id_tarjeta = tarjeta and id_parq = parquimetro and fecha_sal = fecha_act and hora_sal = hora_act;
-         SELECT hora_ent into hora_entrada from estacionamientos where id_tarjeta = tarjeta and id_parq = parquimetro and fecha_sal = fecha_act and hora_sal = hora_act;
-         
-         SELECT TIMEDIFF( TIMESTAMP (fecha_act, hora_act), TIMESTAMP (fecha_entrada, hora_entrada)) into diferencia_tiempo;
-
-         select greatest(-999.99,(saldo_actual-((time_to_sec(diferencia_tiempo)/60) * costo_minuto * (1 - descontar)))) into nuevo_saldo;
-         
-         update tarjetas set saldo = nuevo_saldo where id_tarjeta = tarjeta; 
-         
-        select "cierre" as operacion, time_to_sec(diferencia_tiempo)/60 as tiempo_transcurrido, greatest(-999.99,nuevo_saldo) as saldo_actualizado;
-        
-    else
-        
-        if saldo_actual <0 
-            then 
-                select "apertura" as operacion, "no_exitosa" as resultado, saldo_actual/(costo_minuto*(1-descontar)) as tiempo_disponible;
-            else
-                INSERT INTO Estacionamientos VALUES(tarjeta,parquimetro,CURRENT_DATE(),CURRENT_TIME(),null,null);
-                select "apertura" as operacion, "exitosa" as resultado, saldo_actual/(costo_minuto*(1-descontar)) as tiempo_disponible;
-                
-        end if;
-    end if;
+    commit;
     
     end; !
 delimiter ;
@@ -324,9 +333,6 @@ CREATE USER 'inspector'@'%' IDENTIFIED BY 'inspector';
 # abierto en la ubicación del parqu´ımetro,
 # cargar multas, y
 # registrar accesos a parquímetros.
-CREATE USER 'parquimetro'@'%' IDENTIFIED BY 'parquimetro'; 
-
-GRANT execute on procedure parquimetros.conectar TO 'parquimetro'@'%';
 
 GRANT SELECT ON parquimetros.Parquimetros TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Multa TO 'inspector'@'%';
@@ -335,5 +341,13 @@ GRANT SELECT ON parquimetros.Estacionados TO 'inspector'@'%';
 GRANT SELECT ON parquimetros.Asociado_con TO 'inspector'@'%';
 GRANT INSERT ON parquimetros.Multa TO 'inspector'@'%';
 GRANT INSERT ON parquimetros.Accede TO 'inspector'@'%';
+
+CREATE USER 'parquimetro'@'%' IDENTIFIED BY 'parqui'; 
+
+GRANT execute on procedure parquimetros.conectar TO 'parquimetro'@'%';
+GRANT SELECT ON parquimetros.Parquimetros TO 'parquimetro'@'%';
+GRANT SELECT ON parquimetros.Ubicaciones TO 'parquimetro'@'%';
+GRANT SELECT ON parquimetros.Tarjetas TO 'parquimetro'@'%';
+
 
 

@@ -51,7 +51,6 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
    private JLabel lblAlturaSelec;
    private JLabel lblIdParqSelec;
    private JButton btnVerificar;
-   private JPanel panelPatentes;
    private DefaultListModel<String> l1;
    
    protected Connection conexionBD = null;
@@ -507,27 +506,20 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
 	   
 	   btnVerificar.addActionListener(new ActionListener() {
 
-		@SuppressWarnings("deprecation")
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			Object[] patentes= l1.toArray();
-			Statement st;
 			if(lblIdParqSelec.getText()=="Id parq: ") {
 				JOptionPane.showMessageDialog(null,"Debe seleccionar un parquimetro");
+			}
+			else{
+				
 			}
 		
 		}
 			   
 		   });
 		   
-		   getContentPane().add(panelSeleccionados,BorderLayout.SOUTH);
-	   
-	   
+		   getContentPane().add(panelSeleccionados,BorderLayout.SOUTH);   
    }
-   
-   
-   
-  
-   
    
 }
