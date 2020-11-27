@@ -575,11 +575,6 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
     	  Statement stmt = this.conexionBD.createStatement();
           ResultSet rs = stmt.executeQuery(consulta);
           tablaOperacion.refresh(rs);
-
-    	  // obtenemos el modelo de la tabla a partir de la consulta para 
-    	  // modificar la forma en que se muestran algunas columnas  
-    	  //tablaOperacion.createColumnModelFromQuery();    	    
-    	  
 	  
        }
       catch (SQLException ex)
