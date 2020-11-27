@@ -242,7 +242,8 @@ begin
     declare hora_entrada TIME;
     declare diferencia_tiempo TIME;
     declare costo_minuto int;
-    declare descontar DECIMAL(3,2);   
+    declare descontar DECIMAL(3,2);
+    declare id_estacionado INT;   
 
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN 
@@ -260,20 +261,23 @@ begin
     ELSE
       #si los datos ingresados son validos entonces se obtienen los datos necesarios para ejecutar un cierre o apertura de un estacionamiento
       SELECT saldo into saldo_actual FROM tarjetas WHERE id_tarjeta=tarjeta; 
-      SELECT tarifa into costo_minuto FROM parquimetros NATURAL JOIN ubicaciones WHERE id_parq = parquimetro;
+      
       SELECT descuento into descontar FROM tarjetas NATURAL JOIN tipos_tarjeta WHERE id_tarjeta = tarjeta;
 
       #Se verifica si la tarjeta tiene un estacionamiento abierto
-      if exists(SELECT * FROM estacionamientos WHERE id_tarjeta = tarjeta AND id_parq = parquimetro AND (fecha_sal is NULL) AND (hora_sal is NULL)) THEN 
+      if exists(SELECT * FROM estacionamientos WHERE id_tarjeta = tarjeta AND (fecha_sal is NULL) AND (hora_sal is NULL)) THEN 
+
+          SELECT id_parq INTO id_estacionado FROM estacionamientos WHERE id_tarjeta = tarjeta AND (fecha_sal is NULL) AND (hora_sal is NULL);
+          SELECT tarifa INTO costo_minuto FROM (parquimetros NATURAL JOIN ubicaciones) WHERE id_parq = id_estacionado;
           set fecha_act=CURRENT_DATE();
           set hora_act= CURRENT_TIME();
 
           #fecha y hora de apertura del estacionamiento
-          SELECT fecha_ent into fecha_entrada FROM estacionamientos WHERE id_tarjeta = tarjeta AND id_parq = parquimetro AND fecha_sal IS NULL AND hora_sal IS NULL;
-          SELECT hora_ent into hora_entrada FROM estacionamientos WHERE id_tarjeta = tarjeta AND id_parq = parquimetro AND fecha_sal IS NULL AND hora_sal IS NULL;
+          SELECT fecha_ent into fecha_entrada FROM estacionamientos WHERE id_tarjeta = tarjeta AND id_parq = id_estacionado AND fecha_sal IS NULL AND hora_sal IS NULL;
+          SELECT hora_ent into hora_entrada FROM estacionamientos WHERE id_tarjeta = tarjeta AND id_parq = id_estacionado AND fecha_sal IS NULL AND hora_sal IS NULL;
 
           #Se cierra el estacionamiento con la fecha y hora actual
-          UPDATE estacionamientos SET fecha_sal = fecha_act,hora_sal = hora_act WHERE id_tarjeta = tarjeta AND id_parq=parquimetro AND fecha_sal is NULL AND hora_sal is NULL;
+          UPDATE estacionamientos SET fecha_sal = fecha_act,hora_sal = hora_act WHERE id_tarjeta = tarjeta AND id_parq=id_estacionado AND fecha_sal is NULL AND hora_sal is NULL;
            
           SET diferencia_tiempo=TIMEDIFF( TIMESTAMP (fecha_act, hora_act), TIMESTAMP (fecha_entrada, hora_entrada));
 
@@ -284,9 +288,10 @@ begin
           SELECT "cierre" AS operacion, time_to_sec(diferencia_tiempo)/60 AS tiempo_transcurrido, greatest(-999.99,nuevo_saldo) AS saldo_actualizado;
           
       ELSE
+        SELECT tarifa into costo_minuto FROM parquimetros NATURAL JOIN ubicaciones WHERE id_parq = parquimetro;
           #Si no habia un estacinamiento entonces se deberia abrir uno si el saldo es suficiente
-          IF (saldo_actual <0) THEN 
-              select "apertura" as operacion, "no_exitosa" as resultado, saldo_actual/(costo_minuto*(1-descontar)) as tiempo_disponible;
+          IF (saldo_actual <=0) THEN 
+              select "apertura" as operacion, "no_exitosa" as resultado, "saldo menor a 0" as causa;
           ELSE
               INSERT INTO Estacionamientos VALUES(tarjeta,parquimetro,CURRENT_DATE(),CURRENT_TIME(),NULL,NULL);
               SELECT "apertura" AS operacion, "exitosa" AS resultado, saldo_actual/(costo_minuto*(1-descontar)) AS tiempo_disponible;
