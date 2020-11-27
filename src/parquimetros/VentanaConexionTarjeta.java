@@ -14,8 +14,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,12 +33,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.MaskFormatter;
+
+import quick.dbtable.DBTable;
 
 
 @SuppressWarnings("serial")
@@ -47,11 +52,10 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
    private JTable tabla,tablaParq,tablaTarjeta;
    private JPanel panelTablaFiltro,panelTablaParq,panelTablaTarjeta,panelTablas;
    private JPanel panelSeleccionados;
-   private JLabel lblCalleSelec;
-   private JLabel lblAlturaSelec;
-   private JLabel lblIdParqSelec;
-   private JButton btnVerificar;
+   private JLabel lblCalleSelec, lblAlturaSelec,lblIdParqSelec, lblTarjetaSelec;
+   private JButton btnConectar;
    private DefaultListModel<String> l1;
+
    
    protected Connection conexionBD = null;
 
@@ -114,6 +118,29 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
          this.seleccionarFila();
       }
    }
+   
+   private void tablaParqMouseClicked(MouseEvent evt) 
+   {
+      if ((this.tablaParq.getSelectedRow() != -1) && (evt.getClickCount() == 2))
+      {
+    	 int seleccionado=tablaParq.getSelectedRow();
+    	 String parq = this.tablaParq.getValueAt(seleccionado, 0).toString();
+    	 
+         this.lblIdParqSelec.setText(parq);
+      }
+   }
+   
+   private void tablaTarjetaMouseClicked(MouseEvent evt) 
+   {
+      if ((this.tablaTarjeta.getSelectedRow() != -1) && (evt.getClickCount() == 2))
+      {
+    	 int seleccionado=tablaTarjeta.getSelectedRow();
+    	 String parq = this.tablaTarjeta.getValueAt(seleccionado, 0).toString();
+    	 
+         this.lblTarjetaSelec.setText(parq);
+      }
+   }
+   
    
    private void tablaKeyTyped(KeyEvent evt) 
    {
@@ -403,7 +430,7 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
               
               tablaParq.addMouseListener(new MouseAdapter() {
                  public void mouseClicked(MouseEvent evt) {
-                    tablaMouseClicked(evt);
+                    tablaParqMouseClicked(evt);
                  }
           		});
               scrTablaParq.setViewportView(tablaParq); //setea la tabla dentro del JScrollPane srcTabla               
@@ -477,7 +504,7 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
               
               tablaTarjeta.addMouseListener(new MouseAdapter() {
                  public void mouseClicked(MouseEvent evt) {
-                    tablaMouseClicked(evt);
+                    tablaTarjetaMouseClicked(evt);
                  }
           		});
               scrTablaTarjeta.setViewportView(tablaTarjeta); //setea la tabla dentro del JScrollPane srcTabla               
@@ -492,27 +519,30 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
 }
    
    private void crearPanelSeleccionados() {
-	   panelSeleccionados= new JPanel(new GridLayout(1,4));
+	   panelSeleccionados= new JPanel(new GridLayout(1,5));
        panelSeleccionados.setPreferredSize(new Dimension(getContentPane().getWidth(),50));
 	   lblCalleSelec= new JLabel("Calle: ");
 	   lblAlturaSelec= new JLabel("Altura: ");
 	   lblIdParqSelec= new JLabel("Id parq: ");
-	   btnVerificar= new JButton("Verificar");
-	   btnVerificar.setMaximumSize(new Dimension(60,20));
+	   lblTarjetaSelec= new JLabel("Id tarjeta: ");
+	   
+	   btnConectar= new JButton("Conectar");
+	   btnConectar.setMaximumSize(new Dimension(60,20));
 	   panelSeleccionados.add(lblCalleSelec);
 	   panelSeleccionados.add(lblAlturaSelec);
 	   panelSeleccionados.add(lblIdParqSelec);
-	   panelSeleccionados.add(btnVerificar);
+	   panelSeleccionados.add(lblTarjetaSelec);
+	   panelSeleccionados.add(btnConectar);
 	   
-	   btnVerificar.addActionListener(new ActionListener() {
+	   btnConectar.addActionListener(new ActionListener() {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if(lblIdParqSelec.getText()=="Id parq: ") {
-				JOptionPane.showMessageDialog(null,"Debe seleccionar un parquimetro");
+			if(lblCalleSelec.getText()=="Calle: " ||lblIdParqSelec.getText()=="Id parq: " || lblAlturaSelec.getText() == "Altura: " || lblTarjetaSelec.getText()=="Id tarjeta: ") {
+				JOptionPane.showMessageDialog(null,"Debe Completar todos los campos");
 			}
 			else{
-				
+				conectar(lblTarjetaSelec.getText(),lblIdParqSelec.getText());
 			}
 		
 		}
@@ -522,4 +552,52 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
 		   getContentPane().add(panelSeleccionados,BorderLayout.SOUTH);   
    }
    
+   private void conectar(String id_tarjeta, String id_parquimetro) {
+	    JPanel panelOperacion = new JPanel();
+	    DBTable tablaOperacion;
+	    tablaOperacion = new DBTable();
+		tablaOperacion.setEditable(false);  
+		tablaOperacion.setConnection(conexionBD);
+		String sql = "call conectar("+id_tarjeta+","+id_parquimetro+");";
+		System.out.println(sql);
+		
+		panelOperacion.add(tablaOperacion);
+		refrescarTabla(tablaOperacion,sql);
+		
+		JOptionPane.showMessageDialog(null,panelOperacion, "Resultado de la Operacion",JOptionPane.INFORMATION_MESSAGE);
+	      
+	
+   }
+   private void refrescarTabla(DBTable tablaOperacion,String consulta)
+   {
+      try
+      {    
+    	  Statement stmt = this.conexionBD.createStatement();
+          ResultSet rs = stmt.executeQuery(consulta);
+          tablaOperacion.refresh(rs);
+
+    	  // obtenemos el modelo de la tabla a partir de la consulta para 
+    	  // modificar la forma en que se muestran algunas columnas  
+    	  //tablaOperacion.createColumnModelFromQuery();    	    
+    	  
+	  
+       }
+      catch (SQLException ex)
+      {
+         // en caso de error, se muestra la causa en la consola
+         System.out.println("SQLException: " + ex.getMessage());
+         System.out.println("SQLState: " + ex.getSQLState());
+         System.out.println("VendorError: " + ex.getErrorCode());
+         JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
+                                       ex.getMessage() + "\n", 
+                                       "Error al ejecutar la consulta.",
+                                       JOptionPane.ERROR_MESSAGE);
+         
+      }
+      
+   }
+
+
+   
 }
+
