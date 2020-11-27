@@ -16,7 +16,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -56,6 +58,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
    private JPanel panelPatentes;
    private DefaultListModel<String> l1;
    protected int inspector;
+   private int idAsociadoCon;
    
    protected Connection conexionBD = null;
 
@@ -313,13 +316,15 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			}
 			else{
 				try {
+					l1.removeAllElements();
 					if(conexionBD.isValid(3)) {
 						Calendar hoy = Calendar.getInstance();
 						hoy.set(Calendar.HOUR_OF_DAY, new Date().getHours());
 							if (registrarAcceso(hoy)) {
 								String calle="",altura="";
 								st = conexionBD.createStatement();
-								ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where calle="+lblCalleSelec.getText()+" and altura="+lblAlturaSelec.getText()+";");
+								ResultSet rs = st.executeQuery("select patente from parquimetros natural join estacionados where calle='"+lblCalleSelec.getText()+"' and altura="+lblAlturaSelec.getText()+";");
+								
 								
 								ArrayList<String> tieneMulta = new ArrayList<String>();
 								ArrayList<String> registrado = new ArrayList<String>();
@@ -351,7 +356,8 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 								for(String patente:tieneMulta) {
 									st = conexionBD.createStatement();
 									
-									st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES(\""+fecha+"\",\""+hora+"\",\""+patente+"\","+inspector+");");
+									System.out.println("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES('"+fecha+"','"+hora+"',"+patente+","+idAsociadoCon+");");
+									st.executeUpdate("INSERT INTO multa (fecha,hora,patente,id_asociado_con) VALUES('"+fecha+"','"+hora+"','"+patente+"',"+idAsociadoCon+");");
 									rs = st.executeQuery("SELECT DISTINCT LAST_INSERT_ID() from multa;");//se obtiene el ultimo id modificado, en este caso el numero de multa
 									
 									rs.next();
@@ -487,7 +493,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   if (horario>= 8 && horario<=13)
 		   turno="m";
 	   else
-		   if (horario<=19)
+		   if (horario<=24)//CAMBIARLO!
 			   turno="t";
 	   dia=hoy.get(Calendar.DAY_OF_WEEK);
 	   //dia=3;
@@ -513,6 +519,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 			
 			ResultSet rs=st.executeQuery("Select * from asociado_con where dia='"+diaString+"' and turno='"+turno+"' and legajo="+inspector+" and calle='"+lblCalleSelec.getText().toString()+"' and altura="+Integer.parseInt(lblAlturaSelec.getText().toString()));
 			if (rs.next()) {
+				idAsociadoCon=rs.getInt(1);
 				st.execute("INSERT INTO accede VALUES("+inspector+","+idParq+",\""+fecha+"\",\""+hora+"\");");
 				registrado=true;
 			}

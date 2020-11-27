@@ -74,7 +74,7 @@ public class VentanaConexionTarjeta extends javax.swing.JInternalFrame
       try {
          this.setPreferredSize(new java.awt.Dimension(640, 480));
          this.setBounds(0, 0, 640, 480);
-         this.setTitle("Inspector");
+         this.setTitle("Parquimetro");
          this.setClosable(true);
          this.setResizable(true);
          this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
