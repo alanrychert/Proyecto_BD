@@ -493,7 +493,7 @@ public class VentanaInspector extends javax.swing.JInternalFrame
 	   if (horario>= 8 && horario<=13)
 		   turno="m";
 	   else
-		   if (horario<=24)//CAMBIARLO!
+		   if (horario<=19)//CAMBIARLO!
 			   turno="t";
 	   dia=hoy.get(Calendar.DAY_OF_WEEK);
 	   //dia=3;
